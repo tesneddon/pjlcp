@@ -30,9 +30,9 @@
 **--
 */
 #define MODULE PJLCP_NET
-#define VERSION "V1.0"
+#define IDENT "V1.0"
 #ifdef __VMS
-# pragma module MODULE VERSION
+# pragma module MODULE IDENT
 #endif
 #include <arpa/inet.h>
 #include <errno.h>

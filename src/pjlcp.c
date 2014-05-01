@@ -31,9 +31,9 @@
 */
 #include "version.h"
 #define MODULE PJLCP_ROOT
-#define VERSION PJLCP_VERSION
+#define IDENT PJLCP_VERSION
 #ifdef __VMS
-# pragma module MODULE VERSION
+# pragma module MODULE IDENT
 # pragma extern_model save
 # pragma extern_model common_block shr
     char $$Copyright[] = PJLCP_COPYRIGHT;
@@ -123,7 +123,14 @@ int main(int argc,
             case RET_EOF:
             case RET_SUCCESS:
                 if ((pcb.sock != -1) && (pcb.pjlbuf != 0)) {
-                    printf("PJL BUFFER to send...\n");
+                    ssize_t count;
+
+                    count = send(pcb.sock, pcb.pjlbuf, strlen(pcb.pjlbuf), 0);
+                    if (count == -1) {
+                        error(errno, "error sending PJL command");
+                    } else {
+                        printf("data sent"); // queue a recv()
+                    }
                 }
 
                 if (status == RET_EOF) {
