@@ -39,6 +39,19 @@
 #include <stdlib.h>
 #include "common.h"
 
+int act_set_flag(void *ctx) {
+    PCBDEF *pcbp = ctx;
+
+    switch (pcbp->prs.av1) {
+    case 0: pcbp->flags.auto_uel = 1; break;
+    case 1: pcbp->flags.auto_uel = 0; break;
+    case 2: pcbp->flags.summary = 1; break;
+    case 3: pcbp->flags.summary = 0; break;
+    }
+
+    return ACT_SUCCESS;
+}
+
 int act_show_version(void *ctx) {
     PCBDEF *pcbp = ctx;
 

@@ -40,6 +40,11 @@
         unsigned short port;        /* Post number (host order)             */
         struct sockaddr_in addr;    /* Socket address                       */
         int sock;                   /* Active connection socket (-1 if not) */
+        unsigned int wcnt, rcnt;    /* Read/write byte count                */
+        struct {
+            unsigned auto_uel : 1;  /* Automatically prefix UEL             */
+            unsigned summary : 1;   /* Report network traffic counts        */
+        } flags;
     } PCBDEF;
 
 /*
@@ -52,6 +57,7 @@
     int act_help(void *ctx);
     int act_is_connected(void *ctx);
     int act_pjl(void *ctx);
+    int act_set_flag(void *ctx);
     int act_show_connection(void *ctx);
     int act_show_version(void *ctx);
 

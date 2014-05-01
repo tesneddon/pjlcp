@@ -46,6 +46,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "common.h"
+#define RECVBUF_MAX 1024
 
 /*
 ** Forward routines
@@ -69,6 +70,7 @@
         { act_help,             "act_help"              },
         { act_is_connected,     "act_is_connected"      },
         { act_pjl,              "act_pjl"               },
+        { act_set_flag,         "act_set_flag"          },
         { act_show_connection,  "act_show_connection"   },
         { act_show_version,     "act_show_version"      },
         { 0,                    0                       },
@@ -78,7 +80,8 @@ int main(int argc,
          char *argv[]) {
 
     PCBDEF pcb;
-    char buf[512];
+    char buf[512] = { 0 }, recvbuf[RECVBUF_MAX];
+    ssize_t count;
     int status;
 
     /*
@@ -112,33 +115,20 @@ int main(int argc,
         if (isatty(STDIN_FILENO)) version();
         fputc('\n', stderr);
 
-        buf[0]='\0';
-
         /*
         ** Start parsing commands...
         */
         do {
             status = pr_command(&pcb.prs);
             switch (status) {
-            case RET_EOF:
             case RET_SUCCESS:
-                if ((pcb.sock != -1) && (pcb.pjlbuf != 0)) {
-                    ssize_t count;
+                break;
 
-                    count = send(pcb.sock, pcb.pjlbuf, strlen(pcb.pjlbuf), 0);
-                    if (count == -1) {
-                        error(errno, "error sending PJL command");
-                    } else {
-                        printf("data sent"); // queue a recv()
-                    }
-                }
-
-                if (status == RET_EOF) {
-                    status = RET_QUIT;
+            case RET_EOF:
+                status = RET_QUIT;
 #ifndef __VMS
-                    fputc('\n', stdout);
+                fputc('\n', stdout);
 #endif
-                }
                 break;
 
             case RET_FILE:
@@ -150,7 +140,11 @@ int main(int argc,
                 break;
             }
 
-            buf[0]='\0';
+            /*
+            ** Clear the command buffer as well as free up and PJL
+            ** buffer.
+            */
+            buf[0] = '\0';
             if (pcb.pjlbuf != 0) {
                 free(pcb.pjlbuf);
                 pcb.pjlbuf = 0;

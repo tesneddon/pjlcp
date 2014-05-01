@@ -9,6 +9,7 @@ PROMPT "pjlcp> "
     WORD    EXIT        MIN 3  CALL act_exit            GOTO    check_eol
     WORD    HELP        MIN 3                           GOTO    arg_help
     WORD    QUIT        MIN 3  CALL act_exit            GOTO    check_eol
+    WORD    SET         MIN 3                           GOTO    arg_set
     WORD    SHOW        MIN 2                           GOTO    arg_show
     FORCE                      CALL act_is_connected    GOTO    pjl
 
@@ -41,6 +42,15 @@ ELEMENT *
 
 ELEMENT *
     FORCE                      CALL act_connect:0       GOTO    check_eol
+
+! SET ...
+!
+ELEMENT arg_set -
+PROMPT "What? "
+    WORD    AUTO_UEL    MIN 3   CALL act_set_flag:0     GOTO    check_eol
+    WORD    NOAUTO_UEL  MIN 4   CALL act_set_flag:1     GOTO    check_eol
+    WORD    NOSUMMARY   MIN 4   CALL act_set_flag:3     GOTO    check_eol
+    WORD    SUMMARY     MIN 3   CALL act_set_flag:2     GOTO    check_eol
 
 ! SHOW CONNECTION | VERSION
 !
