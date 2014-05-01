@@ -1,3 +1,4 @@
+CLEANFILES = pjlcp.bin
 BUILT_SOURCES = pjlcp.bin
 AM_CPPFLAGS = -I$(top_srcdir)/include
 bin_PROGRAMS = pjlcp
