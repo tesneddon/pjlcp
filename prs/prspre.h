@@ -94,10 +94,10 @@
  * General definitions.
  */
 
-#ifndef _PRSPRE_H 
+#ifndef _PRSPRE_H
 #define _PRSPRE_H 1
 
-#ifndef YES 
+#ifndef YES
 #define YES    1
 #define NO     0
 #endif /* YES */
@@ -384,6 +384,30 @@
 #define SWT_CEL		0x10	/* If 1, exact case for WOR/CHA/STR tests */
 #define SWT_CLE		0x20	/* If 1, exact case for LEA chars */
 #define SWT_CTE		0x40	/* If 1, exact case for TER chars */
+
+#ifdef HAVE_LIBREADLINE
+#  if defined(HAVE_READLINE_READLINE_H)
+#    include <readline/readline.h>
+#  elif defined(HAVE_READLINE_H)
+#    include <readline.h>
+#  else /* !defined(HAVE_READLINE_H) */
+extern char *readline ();
+#  endif /* !defined(HAVE_READLINE_H) */
+#else /* !defined(HAVE_READLINE_READLINE_H) */
+#  error "readline is not found on this system"
+#endif /* HAVE_LIBREADLINE */
+#ifdef HAVE_READLINE_HISTORY
+#  if defined(HAVE_READLINE_HISTORY_H)
+#    include <readline/history.h>
+#  elif defined(HAVE_HISTORY_H)
+#    include <history.h>
+#  else /* !defined(HAVE_HISTORY_H) */
+extern void add_history ();
+extern int write_history ();
+extern int read_history ();
+#  endif /* defined(HAVE_READLINE_HISTORY_H) */
+  /* no history */
+#endif /* HAVE_READLINE_HISTORY */
 
 #endif /* _PRSPRE_H */
 
