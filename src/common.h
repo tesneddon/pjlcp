@@ -1,0 +1,64 @@
+/*
+** COMMON.H
+**
+**  Header file containing common definitions for PJLCP.
+**
+**  Copyright (c) 2014, Endless Software Solutions.
+**
+**  All rights reserved.
+**
+**  This program is free software: you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation, either version 3 of the License.
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+#ifndef PJLCP_COMMON_H_
+#define PJLCP_COMMON_H_
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <prsdef.h>
+
+#define DEFAULT_PORT 9100
+
+/*
+** Parser Control Block.  This is use by the pr_command routine to store
+** sate is prs.  The remaining fields are used by the action routines.
+*/
+
+    typedef struct _pcb {
+        struct prs prs;             /* PRS Control Block -- must be first   */
+        char *pjlbuf;               /* PJL command buffer                   */
+        char *hostname;             /* Hostname of current connection       */
+        unsigned short port;        /* Post number (host order)             */
+        struct sockaddr_in addr;    /* Socket address                       */
+        int sock;                   /* Active connection socket (-1 if not) */
+    } PCBDEF;
+
+/*
+** Action routines
+*/
+
+    int act_connect(void *ctx);
+    int act_disconnect(void *ctx);
+    int act_exit(void *ctx);
+    int act_help(void *ctx);
+    int act_is_connected(void *ctx);
+    int act_pjl(void *ctx);
+    int act_show_connection(void *ctx);
+    int act_show_version(void *ctx);
+
+/*
+** main.c
+*/
+
+    void version(void);
+
+#endif /* PJLCP_COMMON_H_ */

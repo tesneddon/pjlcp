@@ -1,0 +1,54 @@
+ELEMENT * -
+PROMPT "pjlcp> "
+    CHAR    e                                           SUCCESS
+    CHAR    !                  CALL act_comment         SUCCESS
+    CHAR    #                  CALL act_comment         SUCCESS
+    CHAR    ?                                           GOTO    arg_help
+    WORD    CONNECT     MIN 3                           GOTO    arg_connect
+    WORD    DISCONNECT  MIN 3  CALL act_disconnect      GOTO    check_eol
+    WORD    EXIT        MIN 3  CALL act_exit            GOTO    check_eol
+    WORD    HELP        MIN 3                           GOTO    arg_help
+    WORD    QUIT        MIN 3  CALL act_exit            GOTO    check_eol
+    WORD    SHOW        MIN 2                           GOTO    arg_show
+    FORCE                      CALL act_is_connected    GOTO    pjl
+
+ELEMENT pjl
+    WORD    COMMENT     MIN 3  CALL act_comment         GOTO    check_eol
+    WORD    ECHO        MIN 3  CALL act_echo            GOTO    check_eol
+    WORD    INITIALIZE  MIN 3  CALL act_init            GOTO    check_eol
+    WORD    PJL         MIN 3  CALL act_pjl             GOTO    check_eol
+    WORD    RESET       MIN 3  CALL act_reset           GOTO    check_eol
+    WORD    UEL         MIN 3  CALL act_uel             GOTO    check_eol
+    WORD    USTATUSOFF  MIN 3  CALL act_ustatusoff      GOTO    check_eol
+
+ELEMENT arg_help
+    WORD    EXIT        MIN 3  CALL act_help:1          GOTO    check_eol
+    WORD    HELP        MIN 3  CALL act_help:2          GOTO    check_eol
+    WORD    PJL         MIN 3  CALL act_help:3          GOTO    check_eol
+    WORD    QUIT        MIN 3  CALL act_help:1          GOTO    check_eol
+    FORCE                      CALL act_help:0          GOTO    check_eol
+
+! CONNECT <hostname> [ <port> ]
+!
+ELEMENT arg_connect -
+PROMPT "Where? "
+    STRING  ad.-_       MIN 1  CALL act_connect:1       NEXT
+
+ELEMENT *
+    CHAR    e                                           NEXT
+    DECIMAL                    CALL act_connect:2       NEXT
+    STRING  ad-_        MIN 1  CALL act_connect:3       NEXT
+
+ELEMENT *
+    FORCE                      CALL act_connect:0       GOTO    check_eol
+
+! SHOW CONNECTION | VERSION
+!
+ELEMENT arg_show -
+PROMPT "What? "
+    WORD    CONNECTION  MIN 3  CALL act_show_connection GOTO   check_eol
+    WORD    VERSION     MIN 3  CALL act_show_version    GOTO   check_eol
+
+ELEMENT check_eol
+    CHAR    e                                           SUCCESS
+
