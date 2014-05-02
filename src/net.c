@@ -206,46 +206,24 @@ int act_show_connection(void *ctx) {
 } /* act_show_connection */
 
 int send_pjl(void *ctx,
-             char *buf,
-             int len,
+             char *cmd,
+             int cmdlen,
              int expect_response) {
 
-    static const char prefix[] = "@PJL ";
-    static const char suffix[] = "\r\n";
-    static const char uel[] = "\033%-12345";
+    static const char uel[] = "\033%-12345X";
     PCBDEF *pcbp = ctx;
-    int count, status = ACT_SUCCESS;
+    char *buf = 0;
+    int count, len, status = ACT_ERROR;
 
-    if (pcbp->flags.auto_uel) {
-        count = send(pcbp->sock, uel, sizeof(uel)-1, 0);
-        if (count == -1) {
-            error(errno, "failed to send automatic UEL sequence");
-            status = ACT_ERROR;
-        }
-    }
+    len = asprintf(&buf, "%s@PJL %-*.*s\r\n",
+                   pcbp->flags.auto_uel ? uel : "", cmdlen, cmdlen, cmd);
+    if (len == -1) raise(SIGSEGV);
 
-    if ((status == ACT_SUCCESS) && (len != 0)) {
-        status = ACT_ERROR;
-
-        count = send(pcbp->sock, prefix, sizeof(prefix)-1, 0);
-        if (count != sizeof(prefix)-1) {
-            error(errno, "failed to send PJL prefix");
-        } else {
-            count = send(pcbp->sock, buf, len, 0);
-            if (count != len) {
-                error(errno, "failed to send PJL command");
-            } else {
-                count = send(pcbp->sock, suffix, sizeof(suffix)-1, 0);
-                if (count != sizeof(suffix)-1) {
-                    error(errno, "failed to send line terminator");
-                } else {
-                    status = ACT_SUCCESS;
-                }
-            }
-        }
-    }
-
-    if ((status == ACT_SUCCESS) && expect_response) {
+    count = send(pcbp->sock, buf, len, 0);
+    if (count != len) {
+        error(errno, "failed to send PJL command sequence");
+    } else {
+        // ?
         char rbuf[2048];
 
         count = recv(pcbp->sock, rbuf, sizeof(rbuf), 0);
@@ -260,6 +238,8 @@ int send_pjl(void *ctx,
             // else
                 // go round again
     }
+
+    free(buf);
 
     return status;
 } /* send_pjl */
