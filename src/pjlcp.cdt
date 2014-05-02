@@ -13,14 +13,20 @@ PROMPT "pjlcp> "
     WORD    SHOW        MIN 2                           GOTO    arg_show
     FORCE                      CALL act_is_connected    GOTO    pjl
 
+! PJL Commands.  These can only executed with an active network
+! connection.
+!
 ELEMENT pjl
-    WORD    COMMENT     MIN 3  CALL act_comment         GOTO    check_eol
-    WORD    ECHO        MIN 3  CALL act_echo            GOTO    check_eol
-    WORD    INITIALIZE  MIN 3  CALL act_init            GOTO    check_eol
-    WORD    PJL         MIN 3  CALL act_pjl             GOTO    check_eol
-    WORD    RESET       MIN 3  CALL act_reset           GOTO    check_eol
-    WORD    UEL         MIN 3  CALL act_uel             GOTO    check_eol
-    WORD    USTATUSOFF  MIN 3  CALL act_ustatusoff      GOTO    check_eol
+    WORD    COMMENT     MIN 3  CALL act_pjl_rol:0       NEXT
+    WORD    ECHO        MIN 3  CALL act_pjl_rol:1       GOTO    pjl_rol
+    WORD    INFO        MIN 3                           GOTO    pjl_info
+    WORD    INITIALIZE  MIN 3  CALL act_pjl_single:0    NEXT
+    WORD    RESET       MIN 3  CALL act_pjl_single:1    NEXT
+    WORD    UEL         MIN 3  CALL act_pjl_uel         NEXT
+    WORD    USTATUSOFF  MIN 3  CALL act_pjl_single:2    NEXT
+
+ELEMENT *
+    FORCE                      CALL act_pjl_xmit:0      SUCCESS
 
 ELEMENT arg_help
     WORD    EXIT        MIN 3  CALL act_help:1          GOTO    check_eol
@@ -62,3 +68,20 @@ PROMPT "What? "
 ELEMENT check_eol
     CHAR    e                                           SUCCESS
 
+ELEMENT pjl_info
+    WORD    CONFIG      MIN 3  CALL act_pjl_info:0      NEXT
+    WORD    FILESYS     MIN 3  CALL act_pjl_info:1      NEXT
+    WORD    ID          MIN 2  CALL act_pjl_info:2      NEXT
+    WORD    INFO        MIN 3  CALL act_pjl_info:3      NEXT
+    WORD    MEMORY      MIN 3  CALL act_pjl_info:4      NEXT
+    WORD    PAGECOUNT   MIN 3  CALL act_pjl_info:5      NEXT
+    WORD    STATUS      MIN 3  CALL act_pjl_info:6      NEXT
+    WORD    USTATUS     MIN 3  CALL act_pjl_info:7      NEXT
+    WORD    VARIABLES   MIN 3  CALL act_pjl_info:8      NEXT
+    FORCE                      CALL act_pjl_info:3      NEXT
+
+ELEMENT *
+    FORCE                      CALL act_pjl_xmit:1      SUCCESS
+
+ELEMENT pjl_rol
+    FORCE                      CALL act_pjl_xmit:0      SUCCESS

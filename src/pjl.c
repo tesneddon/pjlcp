@@ -41,12 +41,87 @@
 #include <string.h>
 #include "common.h"
 
-int act_pjl(void *ctx) {
+/*
+** Forward declarations
+*/
 
+    int act_pjl_info(void *ctx);
+    int act_pjl_rol(void *ctx);
+    int act_pjl_single(void *ctx);
+    int act_pjl_uel(void *ctx);
+
+int act_pjl_rol(void *ctx) {
+    static const char *command[] = {
+        "COMMENT", "ECHO"
+    };
+    PCBDEF *pcbp = ctx;
+    int status;
+
+    status = asprintf(&pcbp->pjlbuf, "%s %s", command[pcbp->prs.av1],
+                      pcbp->prs.nxt);
+    if (status == -1) raise(SIGSEGV);
+
+    return ACT_SUCCESS;
+} /* act_pjl_comment */
+
+int act_pjl_info(void *ctx) {
     PCBDEF *pcbp = ctx;
 
-    pcbp->pjlbuf = strdup("\033%-12345X");
+    switch (pcbp->prs.av1) {
+    case 0: pcbp->pjlbuf = strdup("INFO CONFIG");    break;
+    case 1: pcbp->pjlbuf = strdup("INFO FILESYS");   break;
+    case 2: pcbp->pjlbuf = strdup("INFO ID");        break;
+    case 3: pcbp->pjlbuf = strdup("INFO INFO");      break;
+    case 4: pcbp->pjlbuf = strdup("INFO MEMORY");    break;
+    case 5: pcbp->pjlbuf = strdup("INFO PAGECOUNT"); break;
+    case 6: pcbp->pjlbuf = strdup("INFO STATUS");    break;
+    case 7: pcbp->pjlbuf = strdup("INFO USTATUS");   break;
+    case 8: pcbp->pjlbuf = strdup("INFO VARIABLES"); break;
+    }
+
     if (pcbp->pjlbuf == 0) raise(SIGSEGV);
 
     return ACT_SUCCESS;
-} /* act_pjl */
+} /* act_pjl_info */
+
+int act_pjl_single(void *ctx) {
+    PCBDEF *pcbp = ctx;
+    int status;
+
+    switch (pcbp->prs.av1) {
+    case 0: pcbp->pjlbuf = strdup("INITIALIZE"); break;
+    case 1: pcbp->pjlbuf = strdup("RESET"); break;
+    case 2: pcbp->pjlbuf = strdup("USTATUSOFF"); break;
+    }
+    if (pcbp->pjlbuf == 0) raise(SIGSEGV);
+
+    return ACT_SUCCESS;
+} /* act_pjl_single */
+
+int act_pjl_xmit(void *ctx) {
+    PCBDEF *pcbp = ctx;
+
+    switch (pcbp->prs.av1) {
+    case 0:             /* No response */
+        send_pjl(ctx, pcbp->pjlbuf, strlen(pcbp->pjlbuf), 0);
+        break;
+
+    case 1:             /* Expect response */
+        send_pjl(ctx, pcbp->pjlbuf, strlen(pcbp->pjlbuf), 1);
+        break;
+    }
+
+    return ACT_SUCCESS;
+} /* act_pjl_xmit */
+
+int act_pjl_uel(void *ctx) {
+    PCBDEF *pcbp = ctx;
+    int auto_uel = pcbp->flags.auto_uel;
+
+    pcbp->flags.auto_uel = 1;
+    send_pjl(ctx, 0, 0, 0);
+    pcbp->flags.auto_uel = auto_uel;
+
+    return ACT_SUCCESS;
+} /* act_pjl_uel */
+

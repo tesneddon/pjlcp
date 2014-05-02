@@ -62,7 +62,6 @@ int act_show_version(void *ctx) {
 
 int act_exit(void *ctx) {
     PCBDEF *pcbp = ctx;
-    printf("EXIT\n");
 
     return ACT_SUCCESS;
 } /* act_exit */

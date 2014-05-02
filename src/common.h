@@ -56,15 +56,26 @@
     int act_exit(void *ctx);
     int act_help(void *ctx);
     int act_is_connected(void *ctx);
-    int act_pjl(void *ctx);
     int act_set_flag(void *ctx);
     int act_show_connection(void *ctx);
     int act_show_version(void *ctx);
+
+    int act_pjl_info(void *ctx);
+    int act_pjl_rol(void *ctx);
+    int act_pjl_single(void *ctx);
+    int act_pjl_uel(void *ctx);
+    int act_pjl_xmit(void *ctx);
 
 /*
 ** main.c
 */
 
     void version(void);
+
+/*
+** net.c
+*/
+
+    int send_pjl(void *ctx, char *buf, int len, int expect_response);
 
 #endif /* PJLCP_COMMON_H_ */

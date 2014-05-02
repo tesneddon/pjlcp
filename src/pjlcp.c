@@ -69,10 +69,15 @@
         { act_exit,             "act_exit"              },
         { act_help,             "act_help"              },
         { act_is_connected,     "act_is_connected"      },
-        { act_pjl,              "act_pjl"               },
         { act_set_flag,         "act_set_flag"          },
         { act_show_connection,  "act_show_connection"   },
         { act_show_version,     "act_show_version"      },
+
+        { act_pjl_info,         "act_pjl_info"          },
+        { act_pjl_rol,          "act_pjl_rol"           },
+        { act_pjl_single,       "act_pjl_single"        },
+        { act_pjl_xmit,         "act_pjl_xmit"          },
+        { act_pjl_uel,          "act_pjl_uel"           },
         { 0,                    0                       },
     };
 
@@ -92,7 +97,9 @@ int main(int argc,
     pcb.prs.cms = sizeof(buf);
     pcb.prs.tbs = 0;
     pcb.prs.act = actions;
+
     pcb.sock = -1;
+    pcb.flags.auto_uel = 1;
 
     /*
     ** Read in the parse table.
