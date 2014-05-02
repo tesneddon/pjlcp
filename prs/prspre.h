@@ -51,6 +51,7 @@
 **  MODIFICATION HISTORY:
 **
 **      02-MAY-2014  V1.0   Sneddon   Code clean up.
+**      03-MAY-2014  V1.1   Sneddon   Changed default terminator to sep.
 **
 **  Revision 1.1.7.2  1996/02/18  23:12:09  marty
 ** 	 Update OSF copyright years
@@ -199,7 +200,7 @@
 #define CHR_SSP		(char)0x01	/* Separator between strings */
 #define CHR_SEN		(char)0x00	/* End of strings (must be '\0') */
 
-#define DEF_TRM		"se"		/* Default terminator string */
+#define DEF_TRM		"sep"		/* Default terminator string */
 
 /*
  * Parse table "compiled" file record offsets.
