@@ -3,8 +3,8 @@
 **  Library PRS,  Module PRSDEF
 **
 **      This header file contains the prefix definitions for call the PRS
-**  command parser functions.  It was part fo the DCE reference
-**  implementation offer by the Open Group .  However, it was originally
+**  command parser functions.  This code was part fo the DCE reference
+**  implementation offered by the Open Group .  However, it was originally
 **  developer at Network & Communications Software Engineering, Digital
 **  Equipment Corporation.
 **
