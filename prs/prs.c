@@ -1,96 +1,108 @@
 /*
- * @OSF_COPYRIGHT@
- * COPYRIGHT NOTICE
- * Copyright (c) 1990, 1991, 1992, 1993, 1994, 1996 Open Software Foundation, Inc.
- * ALL RIGHTS RESERVED (DCE).  See the file named COPYRIGHT.DCE for
- * the full copyright text.
- */
-/*
- * HISTORY
- * $Log: prs.c,v $
- * Revision 1.1.6.2  1996/02/18  19:30:15  marty
- * 	Update OSF copyright years
- * 	[1996/02/18  18:11:44  marty]
- *
- * Revision 1.1.6.1  1995/12/08  15:11:35  root
- * 	Submit OSF/DCE 1.2.1
- * 	[1995/12/08  14:41:02  root]
- * 
- * Revision 1.1.4.3  1994/06/09  18:37:41  devsrc
- * 	cr10871 - expand copyright
- * 	[1994/06/09  18:09:43  devsrc]
- * 
- * Revision 1.1.4.2  1994/03/16  19:41:04  tom
- * 	Bug 10134 - change isalnum to !isalnum.
- * 	[1994/03/16  19:33:05  tom]
- * 
- * Revision 1.1.4.1  1994/03/12  22:00:48  peckham
- * 	DEC serviceability and i18n drop
- * 	[1994/03/12  14:06:26  peckham]
- * 
- * Revision 1.1.2.2  1992/12/30  13:09:03  zeliff
- * 	Embedding copyright notices
- * 	[1992/12/29  22:40:58  zeliff]
- * 
- * Revision 1.1  1992/01/19  15:22:06  devrcs
- * 	Initial revision
- * 
- * $EndLog$
- */
-/*
- * Program PRS, Module PRS - Parse Table File Converter
- *
- * COPYRIGHT (c) DIGITAL EQUIPMENT CORPORATION 1990-1994. ALL RIGHTS RESERVED.
- *
- * THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND  COPIED
- * ONLY  IN  ACCORDANCE  WITH  THE  TERMS  OF  SUCH  LICENSE AND WITH THE
- * INCLUSION OF THE ABOVE COPYRIGHT NOTICE.  THIS SOFTWARE OR  ANY  OTHER
- * COPIES  THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY
- * OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE  IS  HEREBY
- * TRANSFERRED.
- *
- * THE INFORMATION IN THIS SOFTWARE IS SUBJECT TO CHANGE  WITHOUT  NOTICE
- * AND  SHOULD  NOT  BE  CONSTRUED  AS  A COMMITMENT BY DIGITAL EQUIPMENT
- * CORPORATION.
- *
- * DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE OR  RELIABILITY  OF  ITS
- * SOFTWARE ON EQUIPMENT THAT IS NOT SUPPLIED BY DIGITAL.
- *
- *
- * MODULE DESCRIPTION:
- *
- * Program PRS,  Module PRS
- *
- * Convert a parse table text file to a PRS binary file.
- * Main module.
- *
- *
- * Networks & Communications Software Engineering
- *
- * EDIT HISTORY
- *
- * 0.01	29-Apr-85
- *	Networks and Communications, Tools
- *
- * 0.02	15-Aug-85
- *	Fix "int" to "long" casting problems.
- *
- * 0.03	20-Aug-85
- *	Put in system specific binary file I/O controls.
- *
- * 0.04	29-Aug-85
- *	Put in system specific file deletion calls.
- *	Put in a default terminator set.
- *
- * END EDIT HISTORY
- */
+**++
+**  MODULE DESCRIPTION:
+**
+**      This module contains the code that converts a parse table
+**  definition file to a PRS binary file.  It was part fo the DCE reference
+**  implementation offer by the Open Group .  However, it was originally
+**  developer at Network & Communications Software Engineering, Digital
+**  Equipment Corporation.
+**
+**  AUTHOR:
+**
+**  Copyright (c) 2014, Endless Software Solutions.
+**
+**  All rights reserved.
+**
+**  This program is free software: you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation, either version 3 of the License.
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+**
+**  @OSF_COPYRIGHT@
+**  COPYRIGHT NOTICE
+**  Copyright (c) 1990, 1991, 1992, 1993, 1994, 1996 Open Software Foundation, Inc.
+**  ALL RIGHTS RESERVED (DCE).  See the file named COPYRIGHT.DCE for
+**  the full copyright text.
+**
+**  COPYRIGHT (c) DIGITAL EQUIPMENT CORPORATION 1990-1994. ALL RIGHTS RESERVED.
+**
+**  THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND  COPIED
+**  ONLY  IN  ACCORDANCE  WITH  THE  TERMS  OF  SUCH  LICENSE AND WITH THE
+**  INCLUSION OF THE ABOVE COPYRIGHT NOTICE.  THIS SOFTWARE OR  ANY  OTHER
+**  COPIES  THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY
+**  OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE  IS  HEREBY
+**  TRANSFERRED.
+**
+**  THE INFORMATION IN THIS SOFTWARE IS SUBJECT TO CHANGE  WITHOUT  NOTICE
+**  AND  SHOULD  NOT  BE  CONSTRUED  AS  A COMMITMENT BY DIGITAL EQUIPMENT
+**  CORPORATION.
+**
+**  DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE OR  RELIABILITY  OF  ITS
+**  SOFTWARE ON EQUIPMENT THAT IS NOT SUPPLIED BY DIGITAL.
+**
+**  CREATION DATE:  29-APR-1985
+**
+**  MODIFICATION HISTORY:
+**
+**      02-MAY-2014  V1.0   Sneddon  Clean up to remove compiler warnings.
+**
+**  Revision 1.1.6.2  1996/02/18  19:30:15  marty
+**   Update OSF copyright years
+**   [1996/02/18  18:11:44  marty]
+**
+**  Revision 1.1.6.1  1995/12/08  15:11:35  root
+**   Submit OSF/DCE 1.2.1
+**   [1995/12/08  14:41:02  root]
+**
+**  Revision 1.1.4.3  1994/06/09  18:37:41  devsrc
+**   cr10871 - expand copyright
+**   [1994/06/09  18:09:43  devsrc]
+**
+**  Revision 1.1.4.2  1994/03/16  19:41:04  tom
+**   Bug 10134 - change isalnum to !isalnum.
+**   [1994/03/16  19:33:05  tom]
+**
+**  Revision 1.1.4.1  1994/03/12  22:00:48  peckham
+**   DEC serviceability and i18n drop
+**   [1994/03/12  14:06:26  peckham]
+**
+**  Revision 1.1.2.2  1992/12/30  13:09:03  zeliff
+**   Embedding copyright notices
+**   [1992/12/29  22:40:58  zeliff]
+**
+**  Revision 1.1  1992/01/19  15:22:06  devrcs
+**   Initial revision
+**
+**  0.01 29-Apr-85
+**   Networks and Communications, Tools
+**
+**  0.02 15-Aug-85
+**   Fix "int" to "long" casting problems.
+**
+**  0.03 20-Aug-85
+**   Put in system specific binary file I/O controls.
+**
+**  0.04 29-Aug-85
+**   Put in system specific file deletion calls.
+**   Put in a default terminator set.
+**--
+*/
 
 /*
  * General declarations.
  */
-
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
+#include <limits.h>
 #include "prspre.h"
 
 /*
@@ -103,9 +115,9 @@ int $$narg = 1;
 /*
  * Buffers to contain file names.
  */
-char ifile_name[80];			/* Input file name buffer */
-char tfile_name[80];			/* Temporary file name buffer */
-char ofile_name[80];			/* Output file name buffer */
+char ifile_name[PATH_MAX];          /* Input file name buffer */
+char tfile_name[PATH_MAX];          /* Temporary file name buffer */
+char ofile_name[PATH_MAX];          /* Output file name buffer */
 
 /*
  * File control.  Note the output buffer is oversized (INP_MAX) so that we 
@@ -113,20 +125,20 @@ char ofile_name[80];			/* Output file name buffer */
  * to do a final length check before writing out to the file, to make sure
  * we don't write more than OUT_MAX bytes.
  */
-FILE *inpfp;				/* Input file pointer */
-FDECL tmpfp;				/* Temporary file pointer */
-FDECL outfp;				/* Output file pointer */
+FILE *inpfp;                        /* Input file pointer */
+FILE *tmpfp;                        /* Temporary file pointer */
+FILE *outfp;                        /* Output file pointer */
 
-char  inp_buf[INP_MAX];			/* File input buffer */
-char  sav_buf[INP_MAX];			/* Saved input buffer */
+char  inp_buf[INP_MAX];             /* File input buffer */
+char  sav_buf[INP_MAX];             /* Saved input buffer */
 
-long  lin_cnt;				/* Line number */
-long  err_cnt;				/* Error counter */
+long  lin_cnt;                      /* Line number */
+long  err_cnt;                      /* Error counter */
 
-char  out_buf[INP_MAX];			/* Output buffer */
-int   out_len;				/* Length of contents */
+char  out_buf[INP_MAX];             /* Output buffer */
+int   out_len;                      /* Length of contents */
 
-long  out_total;			/* Current size of output file */
+long  out_total;                    /* Current size of output file */
 
 /*
  * Label definition data.  This allows the GOTO buffer index to be stored,
@@ -216,7 +228,7 @@ static int do_swi(void);
 static int do_wor(void);
 static char *fnd_blank(char *);
 static char *fnd_nonblank(char *);
-static int rea_record(FDECL);
+static int rea_record(FILE *);
 static int sb_cal(int);
 static int sb_pro(int);
 static int sb_lea(int);
@@ -230,7 +242,7 @@ static int sb_err(void);
 static int trn_file(void);
 static long trn_number(long,long,char);
 static char trn_upper(char);
-static int wrt_record(FDECL,int);
+static int wrt_record(FILE *,int);
 
 /*
  * main ***
@@ -256,23 +268,21 @@ char *argv[])
     /*
      * Local data.
      */
-    int   exit_flag;		/* Exit after command if YES */
-    register char *pnt0;	/* Temporary pointer */
-    register char *pnt1;	/* Temporary pointer */
-    register char *pnt2;	/* Temporary pointer */
-
-    exit_flag = NO;
+    int   exit_flag = NO;   /* Exit after command if YES */
+    char *pnt0;             /* Temporary pointer */
+    char *pnt1;             /* Temporary pointer */
+    char *pnt2;             /* Temporary pointer */
 
     /*
-     * Check to see if there was any command line input.  If there was, 
+     * Check to see if there was any command line input.  If there was,
      * move it into the standard user input buffer (do not change "argc",
      * because this is used later as a flag).
      */
     if (argc > 1)
     {
-	exit_flag = YES;
-	ifile_name[0] = '\0';
-	strcat(&ifile_name[0], *(++argv));
+        exit_flag = YES;
+        ifile_name[0] = '\0';
+        strcat(&ifile_name[0], *(++argv));
     }
 
     /*
@@ -280,89 +290,81 @@ char *argv[])
      */
     while (YES)
     {
-	/*
-	 * Get user input.  If there was input on the invocation line,
-	 * the input buffer is already filled.
-	 */
-	if (argc <= 1)
-	{
-	    ifile_name[0] = '\0';
-	    while (ifile_name[0] == '\0')
-	    {
-		printf("File: ");
-		if (gets(&ifile_name[0]) == NULL)
-		{
-		    printf("\n");
-#ifdef unix
-		    return(1);
-#else
-		    return;
-#endif
-		}
-	    }
-	}
+        /*
+         * Get user input.  If there was input on the invocation line,
+         * the input buffer is already filled.
+         */
+	    if (argc <= 1)
+        {
+            ifile_name[0] = '\0';
+            while (ifile_name[0] == '\0')
+            {
+                printf("File: ");
+                if (fgets(&ifile_name[0], PATH_MAX, stdin) == 0)
+                {
+                    putchar('\n');
+                    return EXIT_FAILURE;
+                }
+            }
+        }
 
-	/*
-	 *  Set up temp and output file names.  Make sure names have extensions.
-	 */
-	pnt0 = &ifile_name[0];	
-	pnt1 = &tfile_name[0];
-	pnt2 = &ofile_name[0];
+        /*
+         *  Set up temp and output file names.  Make sure names have extensions.
+         */
+        pnt0 = &ifile_name[0];
+        pnt1 = &tfile_name[0];
+        pnt2 = &ofile_name[0];
 
-	while ((*pnt0 != '\0') && (*pnt0 != '.') && (*pnt0 != ';'))
-	{
-	    *pnt1++ = *pnt0;
-	    *pnt2++ = *pnt0;
+        while ((*pnt0 != '\0') && (*pnt0 != '.') && (*pnt0 != ';'))
+        {
+            *pnt1++ = *pnt0;
+            *pnt2++ = *pnt0;
 
-	    if ((*pnt0 == ']') || (*pnt0 == '>') || (*pnt0 == ':'))
-	    {
-		pnt1 = &tfile_name[0];
-	    }
+            if ((*pnt0 == ']') || (*pnt0 == '>') || (*pnt0 == ':'))
+            {
+                pnt1 = &tfile_name[0];
+            }
 
-	    pnt0++;
-	}
+            pnt0++;
+        }
 
-	if (*pnt0 == ';')
-	{
-	    while (*pnt0 != '\0')
-	    {
-		*(pnt0 + strlen(INP_EXT)) = *pnt0;
-		pnt0++;
-	    }
-	    pnt0 -= strlen(INP_EXT);
-	    strcat(pnt0, INP_EXT);
-	    *(pnt0 + strlen(INP_EXT)) = ';';
-	}
+        if (*pnt0 == ';')
+        {
+            while (*pnt0 != '\0')
+            {
+                *(pnt0 + strlen(INP_EXT)) = *pnt0;
+                pnt0++;
+            }
+            pnt0 -= strlen(INP_EXT);
+            strcat(pnt0, INP_EXT);
+            *(pnt0 + strlen(INP_EXT)) = ';';
+        }
 
-	if (*pnt0 == '\0')
-	{
-	    strcat(pnt0, INP_EXT);
-	}
+        if (*pnt0 == '\0')
+        {
+            strcat(pnt0, INP_EXT);
+        }
 
-	*pnt1 = '\0';
-	strcat(pnt1, TMP_EXT);
+        *pnt1 = '\0';
+        strcat(pnt1, TMP_EXT);
 
-	*pnt2 = '\0';
-	strcat(pnt2, OUT_EXT);
+        *pnt2 = '\0';
+        strcat(pnt2, OUT_EXT);
 
-	/*
-	 * Open the files and start the conversion.
-	 */
-	printf(" \n");
-	checkfiles();
+        /*
+         * Open the files and start the conversion.
+         */
+        putchar('\n');
+        checkfiles();
 
-	/*
-	 * Finished with user command.
-	 */
-	if (exit_flag == YES)
-	{
-#ifdef unix
-	    return(0);
-#else
-	    return;
-#endif
-	}
-    }			
+        /*
+         * Finished with user command.
+         */
+        if (exit_flag == YES)
+        {
+            return EXIT_SUCCESS;
+        }
+    }
 
     /*
      * End of main routine.
@@ -396,7 +398,7 @@ checkfiles (void)
     /*
      * Open the input file.  Check for errors.
      */
-    if ((inpfp = fopen(&ifile_name[0], "r")) == NULL)
+    if ((inpfp = fopen(&ifile_name[0], "r")) == 0)
     {
 	printf("Could not open input file: %s\n\n", &ifile_name[0]);
 	return;
@@ -405,7 +407,7 @@ checkfiles (void)
     /*
      * Open the temporary file.
      */
-    if ((tmpfp = FOPENB(&tfile_name[0], FOUT)) == (int)NULL)
+    if ((tmpfp = fopen(&tfile_name[0], "w")) == 0)
     {
 	fclose(inpfp);
 	printf("Could not open temporary file: %s\n\n", &tfile_name[0]);
@@ -432,11 +434,11 @@ checkfiles (void)
     /*
      * Finished with translation.
      */
-    FPUTCB(REC_EOF, tmpfp);
+    fputc(REC_EOF, tmpfp);
     out_total++;
 
     fclose(inpfp);
-    FCLOSB(tmpfp);
+    fclose(tmpfp);
 
     save_total = out_total;
 
@@ -448,32 +450,32 @@ checkfiles (void)
     /*
      * Re-open the temporary file and open the real output file.
      */
-    if ((tmpfp = FOPENB(&tfile_name[0], FINP)) == (int)NULL)
+    if ((tmpfp = fopen(&tfile_name[0], "r")) == 0)
     {
-	FDELET(&tfile_name[0]);
-	printf("Could not reopen temporary file: %s\n\n", &tfile_name[0]);
-	return;
+        unlink(&tfile_name[0]);
+        printf("Could not reopen temporary file: %s\n\n", &tfile_name[0]);
+        return;
     }
 
-    if ((outfp = FOPENB(&ofile_name[0], FOUT)) == (int)NULL)
+    if ((outfp = fopen(&ofile_name[0], "w")) == 0)
     {
-	FCLOSB(tmpfp);
-	FDELET(&tfile_name[0]);
-	printf("Could not open output file: %s\n\n", &ofile_name[0]);
-	return;
+        fclose(tmpfp);
+        unlink(&tfile_name[0]);
+        printf("Could not open output file: %s\n\n", &ofile_name[0]);
+        return;
     }
 
     /*
      * Insert the version and file size.
      */
-    FPUTCB(PRS_VERSION, outfp);
-    FPUTCB(PRS_EDIT, outfp);
+    fputc(PRS_VERSION, outfp);
+    fputc(PRS_EDIT, outfp);
 
     chr1 = out_total & 0xFF;
-    FPUTCB(chr1, outfp);
+    fputc(chr1, outfp);
 
     chr1 = (out_total >> 8) & 0xFF;
-    FPUTCB(chr1, outfp);
+    fputc(chr1, outfp);
 
     /*
      * Copy the temporary file into the real output file.  Put in the proper
@@ -486,10 +488,10 @@ checkfiles (void)
 	 */
     	if (rea_record(tmpfp) == -1)
     	{
-    	    FCLOSB(tmpfp);
-    	    FDELET(&tfile_name[0]);
-    	    FCLOSB(outfp);
-    	    FDELET(&ofile_name[0]);
+    	    fclose(tmpfp);
+    	    unlink(&tfile_name[0]);
+    	    fclose(outfp);
+    	    unlink(&ofile_name[0]);
     	    return (-1);
     	}
 
@@ -571,10 +573,10 @@ checkfiles (void)
     /*
      * All done with file.
      */
-    FCLOSB(tmpfp);
-    FDELET(&tfile_name[0]);
+    fclose(tmpfp);
+    unlink(&tfile_name[0]);
 
-    FCLOSB(outfp);
+    fclose(outfp);
 
     printf("Finished pass 2.\n\n");
     printf("The size of the converted data file is %ld bytes.\n\n", save_total);
@@ -599,7 +601,7 @@ checkfiles (void)
 
 static int
 trn_file (void)
-{						  
+{
     /*
      * Local data.
      */
@@ -709,7 +711,7 @@ trn_file (void)
     	 */
     	if (flg1 == -1)				/* Check for internal SWITCH */
     	{
-	    if ((flg1 = chk_match(&int_swi[0], NULL, 3)) >= 0)
+	    if ((flg1 = chk_match(&int_swi[0], '\0', 3)) >= 0)
     	    {
 	        do_swi();
     	    }
@@ -717,7 +719,7 @@ trn_file (void)
 
     	if (flg1 == -1)				/* Check for ELEMENT */
     	{
-	    if ((flg1 = chk_match(&key_ele[0], NULL, 3)) >= 0)
+	    if ((flg1 = chk_match(&key_ele[0], '\0', 3)) >= 0)
     	    {
 	        if (do_ele() == -1)
         	    return;
@@ -726,49 +728,49 @@ trn_file (void)
 
     	if (flg1 == -1)				/* Check for CHARACTER */
     	{
-	    if ((flg1 = chk_match(&key_cha[0], NULL, 3)) >= 0)
+	    if ((flg1 = chk_match(&key_cha[0], '\0', 3)) >= 0)
 	        do_cha();
     	}
 
     	if (flg1 == -1)				/* Check for WORD */
     	{
-	    if ((flg1 = chk_match(&key_wor[0], NULL, 3)) >= 0)
+	    if ((flg1 = chk_match(&key_wor[0], '\0', 3)) >= 0)
 	        do_wor();
     	}
 
     	if (flg1 == -1)				/* Check for STRING */
     	{
-	    if ((flg1 = chk_match(&key_str[0], NULL, 3)) >= 0)
+	    if ((flg1 = chk_match(&key_str[0], '\0', 3)) >= 0)
 	        do_str();
     	}
 
     	if (flg1 == -1)				/* Check for OCTAL */
     	{
-	    if ((flg1 = chk_match(&key_oct[0], NULL, 3)) >= 0)
+	    if ((flg1 = chk_match(&key_oct[0], '\0', 3)) >= 0)
 	        do_oct();
     	}
 
     	if (flg1 == -1)				/* Check for DECIMAL */
     	{
-	    if ((flg1 = chk_match(&key_dec[0], NULL, 3)) >= 0)
+	    if ((flg1 = chk_match(&key_dec[0], '\0', 3)) >= 0)
 	        do_dec();
     	}
 
     	if (flg1 == -1)				/* Check for HEXADECIMAL */
     	{
-	    if ((flg1 = chk_match(&key_hex[0], NULL, 3)) >= 0)
+	    if ((flg1 = chk_match(&key_hex[0], '\0', 3)) >= 0)
 	        do_hex();
     	}
 
     	if (flg1 == -1)				/* Check for GOSUB */
     	{
-	    if ((flg1 = chk_match(&key_gos[0], NULL, 3)) >= 0)
+	    if ((flg1 = chk_match(&key_gos[0], '\0', 3)) >= 0)
 	        do_gos();
     	}
 
     	if (flg1 == -1)				/* Check for FORCED */
     	{
-	    if ((flg1 = chk_match(&key_for[0], NULL, 3)) >= 0)
+	    if ((flg1 = chk_match(&key_for[0], '\0', 3)) >= 0)
 	        do_for();
     	}
 
@@ -796,7 +798,7 @@ trn_file (void)
 
 static int
 do_swi (void)
-{						  
+{
     /*
      * Local data.
      */
@@ -808,7 +810,7 @@ do_swi (void)
     /*
      * Check for SWITCH TEST.
      */
-    if (chk_match(&int_ele[0], NULL, 3) >= 0)
+    if (chk_match(&int_ele[0], '\0', 3) >= 0)
     {
     	/*
     	 * Set up possible bits for TEST switches.
@@ -819,7 +821,7 @@ do_swi (void)
     /*
      * Check for SWITCH LEADING.
      */
-    else if (chk_match(&int_lea[0], NULL, 3) >= 0)
+    else if (chk_match(&int_lea[0], '\0', 3) >= 0)
     {
     	/*
     	 * Set up possible bits for LEADING switches.
@@ -830,7 +832,7 @@ do_swi (void)
     /*
      * Check for SWITCH TERMINATING.
      */
-    else if (chk_match(&int_ter[0], NULL, 3) >= 0)
+    else if (chk_match(&int_ter[0], '\0', 3) >= 0)
     {
     	/*
     	 * Set up possible bits for TERMINATING switches.
@@ -852,7 +854,7 @@ do_swi (void)
     /*
      * Check for MATCH.
      */
-    if (chk_match(&int_mat[0], NULL, 3) >= 0)
+    if (chk_match(&int_mat[0], '\0', 3) >= 0)
     {
     	/*
          * Clear out all but MATCH switches
@@ -862,7 +864,7 @@ do_swi (void)
     	/*
     	 * Check for MATCH LOGICAL.
     	 */
-    	if (chk_match(&int_log[0], NULL, 3) >= 0)
+    	if (chk_match(&int_log[0], '\0', 3) >= 0)
     	{
     	    swt_flags &= ~bits;
     	}
@@ -870,7 +872,7 @@ do_swi (void)
     	/*
     	 * Check for MATCH ALPHABETIC.
     	 */
-    	else if (chk_match(&int_alp[0], NULL, 3) >= 0)
+    	else if (chk_match(&int_alp[0], '\0', 3) >= 0)
     	{
     	    swt_flags |= bits;
     	}
@@ -890,7 +892,7 @@ do_swi (void)
     /*
      * Check for CASE.
      */
-    else if (chk_match(&int_cas[0], NULL, 3) >= 0)
+    else if (chk_match(&int_cas[0], '\0', 3) >= 0)
     {
     	/*
          * Clear out all but CASE switches
@@ -900,7 +902,7 @@ do_swi (void)
     	/*
     	 * Check for CASE GENERAL.
     	 */
-    	if (chk_match(&int_gen[0], NULL, 3) >= 0)
+    	if (chk_match(&int_gen[0], '\0', 3) >= 0)
     	{
     	    swt_flags &= ~bits;
     	}
@@ -908,7 +910,7 @@ do_swi (void)
     	/*
     	 * Check for CASE EXACT.
     	 */
-    	else if (chk_match(&int_exa[0], NULL, 3) >= 0)
+    	else if (chk_match(&int_exa[0], '\0', 3) >= 0)
     	{
     	    swt_flags |= bits;
     	}
@@ -952,7 +954,7 @@ do_swi (void)
 
 static int
 do_ele (void)
-{						  
+{
     /*
      * Local data.
      */
@@ -2015,7 +2017,7 @@ int off0)
     /*
      * See if it is the proper sub-key.
      */
-    if (chk_match(&sub_cal[0], NULL, 3) == -1)
+    if (chk_match(&sub_cal[0], '\0', 3) == -1)
     {
     	return (0);
     }
@@ -2056,7 +2058,7 @@ int off0)
     /*
      * See if it is the proper sub-key.
      */
-    if (chk_match(&sub_pro[0], NULL, 3) == -1)
+    if (chk_match(&sub_pro[0], '\0', 3) == -1)
     {
     	return (0);
     }
@@ -2121,7 +2123,7 @@ int off0)
 
     if (flg1 == 0)
     {
-    	if (chk_match(&swi_ski[0], NULL, 2) >= 0)
+    	if (chk_match(&swi_ski[0], '\0', 2) >= 0)
     	{
     	    out_buf[XXX_FLG] |= FLG_LSK;
     	    flg1 = 1;
@@ -2130,7 +2132,7 @@ int off0)
 
     if (flg1 == 0)
     {
-        if (chk_match(&swi_inc[0], NULL, 2) >= 0)
+        if (chk_match(&swi_inc[0], '\0', 2) >= 0)
         {
     	    out_buf[XXX_FLG] |= FLG_LIN;
     	    flg1 = 1;
@@ -2205,7 +2207,7 @@ int off0)
 
     if (flg1 == 0)
     {
-    	if (chk_match(&swi_ski[0], NULL, 2) >= 0)
+    	if (chk_match(&swi_ski[0], '\0', 2) >= 0)
     	{
     	    out_buf[XXX_FLG] |= FLG_TSK;
     	    flg1 = 1;
@@ -2214,7 +2216,7 @@ int off0)
 
     if (flg1 == 0)
     {
-        if (chk_match(&swi_kee[0], NULL, 2) >= 0)
+        if (chk_match(&swi_kee[0], '\0', 2) >= 0)
         {
     	    out_buf[XXX_FLG] |= FLG_TNS;
     	    flg1 = 1;
@@ -2223,7 +2225,7 @@ int off0)
 
     if (flg1 == 0)
     {
-        if (chk_match(&swi_inc[0], NULL, 2) >= 0)
+        if (chk_match(&swi_inc[0], '\0', 2) >= 0)
         {
     	    out_buf[XXX_FLG] |= FLG_TIN;
     	    flg1 = 1;
@@ -2283,7 +2285,7 @@ int typ0)
     /*
      * See if it is the proper sub-key, and blank it out.
      */
-    if (chk_match(&sub_min[0], NULL, 3) == -1)
+    if (chk_match(&sub_min[0], '\0', 3) == -1)
     {
     	return (0);
     }
@@ -2293,12 +2295,12 @@ int typ0)
      */
     if (typ0 == 1)
     {
-        out_buf[off0] = trn_number((long)1, (long)255, NULL) & 0xFF;
+        out_buf[off0] = trn_number((long)1, (long)255, '\0') & 0xFF;
     }
 
     else
     {
-        result = trn_number((long)-1, (long)-1, NULL);
+        result = trn_number((long)-1, (long)-1, '\0');
 
     	out_buf[off0++] = result         & 0xFF;
     	out_buf[off0++] = (result >> 8)  & 0xFF;
@@ -2347,7 +2349,7 @@ int typ0)
     /*
      * See if it is the proper sub-key.
      */
-    if (chk_match(&sub_max[0], NULL, 3) == -1)
+    if (chk_match(&sub_max[0], '\0', 3) == -1)
     {
     	return (0);
     }
@@ -2357,12 +2359,12 @@ int typ0)
      */
     if (typ0 == 1)
     {
-        out_buf[off0] = trn_number((long)1, (long)255, NULL) & 0xFF;
+        out_buf[off0] = trn_number((long)1, (long)255, '\0') & 0xFF;
     }
 
     else
     {
-        result = trn_number((long)-1, (long)-1, NULL);
+        result = trn_number((long)-1, (long)-1, '\0');
 
     	out_buf[off0++] = result         & 0xFF;
     	out_buf[off0++] = (result >> 8)  & 0xFF;
@@ -2407,7 +2409,7 @@ sb_got (void)
     /*
      * See if it is the proper sub-key.
      */
-    if (chk_match(&sub_got[0], NULL, 3) == -1)
+    if (chk_match(&sub_got[0], '\0', 3) == -1)
     {
     	return (0);
     }
@@ -2483,7 +2485,7 @@ sb_nex (void)
     /*
      * See if it is the proper sub-key.
      */
-    if (chk_match(&sub_nex[0], NULL, 3) == -1)
+    if (chk_match(&sub_nex[0], '\0', 3) == -1)
     {
     	return (0);
     }
@@ -2535,7 +2537,7 @@ sb_suc (void)
     /*
      * See if it is the proper sub-key.
      */
-    if (chk_match(&sub_suc[0], NULL, 3) == -1)
+    if (chk_match(&sub_suc[0], '\0', 3) == -1)
     {
     	return (0);
     }
@@ -2587,7 +2589,7 @@ sb_err (void)
     /*
      * See if it is the proper sub-key.
      */
-    if (chk_match(&sub_err[0], NULL, 3) == -1)
+    if (chk_match(&sub_err[0], '\0', 3) == -1)
     {
     	return (0);
     }
@@ -2920,7 +2922,7 @@ int  lt)
     	{
     	    if ((le - lp) == strlen(&label[lbl1].name[0]))
     	    {
-    		if (chk_match(&label[lbl1].name[0], NULL, 0) >= 0)
+    		if (chk_match(&label[lbl1].name[0], '\0', 0) >= 0)
     		{
     		    lbl2 = lbl1;
     		    break;
@@ -3018,7 +3020,7 @@ int off0)
     if (*(pnt1 = fnd_nonblank(&inp_buf[0])) == ':')
     {
     	*pnt1 = ' ';
-    	out_buf[off0+3] = trn_number((long)0, (long)255, NULL) & 0xFF;
+    	out_buf[off0+3] = trn_number((long)0, (long)255, '\0') & 0xFF;
     }
 
     return;
@@ -3350,7 +3352,7 @@ chk_goto (void)
  * Read a binary record into "out_buf".
  *
  * Inputs:
- *	fil0 = "FDECL" file pointer.
+ *	fil0 = file pointer.
  *
  * Outputs:
  *	"int" 1 if no error, 0 if last record in file, -1 if premature EOF.
@@ -3359,7 +3361,7 @@ chk_goto (void)
 
 static int
 rea_record (
-FDECL fil0)
+FILE *fil0)
 {
     register char *pnt1 = &out_buf[0];	/* Get pointr to buffer */
     register int cnt1;
@@ -3367,7 +3369,7 @@ FDECL fil0)
     /*
      * Get record type.  If EOF or not legal record type, then error.
      */
-    *pnt1 = cnt1 = FGETCB(fil0);
+    *pnt1 = cnt1 = fgetc(fil0);
     if (cnt1 == EOF)
     {
     	printf("Internal error.  Premature end-of-file encountered.\n\n");
@@ -3391,7 +3393,7 @@ FDECL fil0)
     /*
      * Get the record length.
      */
-    *pnt1++ = cnt1 = FGETCB(fil0);
+    *pnt1++ = cnt1 = fgetc(fil0);
     if (cnt1 == EOF)
     {
     	printf("Internal error.  Premature end-of-file encountered.\n\n");
@@ -3405,7 +3407,7 @@ FDECL fil0)
      */
     while (cnt1-- > 0)
     {
-	int data = FGETCB(fil0);
+	int data = fgetc(fil0);
 
     	*pnt1++ = data;
     	if (data == EOF)
@@ -3427,7 +3429,7 @@ FDECL fil0)
  * Write a binary record from "out_buf".
  *
  * Inputs:
- *	fil0 = "FDECL" file pointer.
+ *	fil0 = file pointer.
  *	len0 = "int" length of the record.
  *
  * Outputs:
@@ -3437,7 +3439,7 @@ FDECL fil0)
 
 static int
 wrt_record (
-FDECL fil0,
+FILE *fil0,
 int len0)
 {
     register char *pnt1 = out_buf;
@@ -3448,7 +3450,7 @@ int len0)
      */
     if (out_buf[XXX_FNC] == REC_EOF)
     {
-	if (FPUTCB(REC_EOF, fil0) == EOF)
+	if (fputc(REC_EOF, fil0) == EOF)
     	{
     	    printf("Error writing to output file.\n\n");
 	    return (-1);
@@ -3476,7 +3478,7 @@ int len0)
      */
     while (cnt1-- > 0)
     {
-	if (FPUTCB(*pnt1++, fil0) == EOF)
+	if (fputc(*pnt1++, fil0) == EOF)
     	{
     	    printf("Error writing to output file.\n\n");
 	    return (-1);

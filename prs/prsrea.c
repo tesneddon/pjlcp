@@ -188,7 +188,7 @@ int pr_read(struct prs *context, char *file_name)
      * Open the file, for READ, in BINARY mode.
      */
 
-    if ((file_p1 = FOPENB(file_name, FINP)) == (int)NULL)
+    if ((file_p1 = fopen(file_name, "r")) == 0)
     {
     	return (RET_OPENERROR);
     }
@@ -201,7 +201,7 @@ int pr_read(struct prs *context, char *file_name)
     /*
      * Close the file.
      */
-    FCLOSB(file_p1);
+    fclose(file_p1);
 
     /*
      * Finished.
@@ -231,7 +231,7 @@ static int pr_rd1(struct prs *context)
     register char *file_buffer;		/* Local pointer to buffer */
     unsigned int file_size;		/* File size for calculations */
     int tmp_file_size;			/* File size as returned from the
-					   FGETCB function - must be int
+					   fgetc function - must be int
 					   so we can check for EOF */
     char local_buffer[4];		/* In case buffer much too small */
 
@@ -248,7 +248,7 @@ static int pr_rd1(struct prs *context)
     /*
      * Check the version/edit.
      */
-    if ((file_char = FGETCB(file_p1)) == EOF)
+    if ((file_char = fgetc(file_p1)) == EOF)
     {
     	return (RET_IOERROR);
     }
@@ -259,7 +259,7 @@ static int pr_rd1(struct prs *context)
 	return (RET_VERSION);
     }
 
-    if ((file_char = FGETCB(file_p1)) == EOF)
+    if ((file_char = fgetc(file_p1)) == EOF)
     {
     	return (RET_IOERROR);
     }
@@ -274,13 +274,13 @@ static int pr_rd1(struct prs *context)
      * Check the file size - save it as an unsigned int for use in the
      * calculations below.
      */
-    if ((tmp_file_size = FGETCB(file_p1)) == EOF)
+    if ((tmp_file_size = fgetc(file_p1)) == EOF)
     {
     	return (RET_IOERROR);
     }
     file_size = (unsigned int)tmp_file_size;
 
-    if ((file_char = FGETCB(file_p1)) == EOF)
+    if ((file_char = fgetc(file_p1)) == EOF)
     {
     	return (RET_IOERROR);
     }
@@ -302,7 +302,7 @@ static int pr_rd1(struct prs *context)
     file_size -= 4;
     while (file_size-- > 0)
     {
-    	if ((file_char = FGETCB(file_p1)) == EOF)
+    	if ((file_char = fgetc(file_p1)) == EOF)
     	{
     	    return (RET_IOERROR);
     	}

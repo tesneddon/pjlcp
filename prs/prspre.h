@@ -1,94 +1,102 @@
 /*
- * @OSF_COPYRIGHT@
- * COPYRIGHT NOTICE
- * Copyright (c) 1990, 1991, 1992, 1993, 1996 Open Software Foundation, Inc.
- * ALL RIGHTS RESERVED (DCE).  See the file named COPYRIGHT.DCE in the
- * src directory for the full copyright text.
- */
-/*
- * HISTORY
- * $Log: prspre.h,v $
- * Revision 1.1.7.2  1996/02/18  23:12:09  marty
- * 	Update OSF copyright years
- * 	[1996/02/18  22:37:04  marty]
- *
- * Revision 1.1.7.1  1995/12/08  18:09:44  root
- * 	Submit OSF/DCE 1.2.1
- * 	[1995/12/08  17:24:25  root]
- * 
- * Revision 1.1.5.1  1994/04/21  22:05:45  cbrooks
- * 	CR 3231, 8353
- * 	[1994/04/21  19:52:27  cbrooks]
- * 
- * 	Checkpoint
- * 	[1994/03/28  20:23:34  cbrooks]
- * 
- * Revision 1.1.3.3  1992/12/30  20:40:32  htf
- * 	Embedding copyright notice
- * 	[1992/12/30  19:09:04  htf]
- * 
- * Revision 1.1.3.2  1992/11/04  18:10:00  ko
- * 	Fix OT 5110 - make sure unix is defined properly, make sure to include pthread.h
- * 	[1992/11/04  15:26:50  ko]
- * 
- * Revision 1.1  1992/01/19  15:35:20  devrcs
- * 	Initial revision
- * 
- * $EndLog$
- */
-/*
+**++
+**  PRSPRE.h
+**
+**      This header file contains the prefix definitions, including binary
+**  file record and field definitions for all the PRS command parser
+**  functions.  This code was part fo the DCE reference implementation
+**  offered by the Open Group .  However, it was originally developer at
+**  Network & Communications Software Engineering, Digital Equipment
+**  Corporation.
+**
+**  Copyright (c) 2014, Endless Software Solutions.
+**
+**  All rights reserved.
+**
+**  This program is free software: you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation, either version 3 of the License.
+**
+**  This program is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+**
+**  @OSF_COPYRIGHT@
+**  COPYRIGHT NOTICE
+**  Copyright (c) 1990, 1991, 1992, 1993, 1996 Open Software Foundation, Inc.
+**  ALL RIGHTS RESERVED (DCE).  See the file named COPYRIGHT.DCE in the
+**  src directory for the full copyright text.
+**
+**  Copyright (C) 1985 by
+**  Digital Equipment Corporation, Maynard, Mass.
+**
+**  This software is furnished under a license and may be used and copied
+**  only  in  accordance  with  the  terms  of such  license and with the
+**  inclusion of the above copyright notice. This software or  any  other
+**  copies thereof may not be provided or otherwise made available to any
+**  other person. No title to and ownership of  the  software  is  hereby
+**  transferred.
+**
+**  The information in this software is subject to change without  notice
+**  and  should  not be  construed  as  a commitment by Digital Equipment
+**  Corporation.
+**
+**  Digital assumes no responsibility for the use or  reliability  of its
+**  software on equipment which is not supplied by Digital.
+**
+**  MODIFICATION HISTORY:
+**
+**      02-MAY-2014  V1.0   Sneddon   Code clean up.
+**
+**  Revision 1.1.7.2  1996/02/18  23:12:09  marty
+** 	 Update OSF copyright years
+** 	 [1996/02/18  22:37:04  marty]
+**
+**  Revision 1.1.7.1  1995/12/08  18:09:44  root
+**   Submit OSF/DCE 1.2.1
+**   [1995/12/08  17:24:25  root]
+**
+**  Revision 1.1.5.1  1994/04/21  22:05:45  cbrooks
+** 	 CR 3231, 8353
+** 	 [1994/04/21  19:52:27  cbrooks]
+**
+** 	Checkpoint
+** 	 [1994/03/28  20:23:34  cbrooks]
+**
+**  Revision 1.1.3.3  1992/12/30  20:40:32  htf
+**   Embedding copyright notice
+**   [1992/12/30  19:09:04  htf]
+**
+**  Revision 1.1.3.2  1992/11/04  18:10:00  ko
+**   Fix OT 5110 - make sure unix is defined properly, make sure to
+**                 include pthread.h
+**   [1992/11/04  15:26:50  ko]
+**
+**  Revision 1.1  1992/01/19  15:35:20  devrcs
+**   Initial revision
+**
+**  DEC/CMS REPLACEMENT HISTORY, Element PRSPRE.H
+**  *3     8-AUG-1991 16:32:59 COMUZZI "Slight change to last fix"
+**  *2     8-AUG-1991 16:15:47 COMUZZI "Fixed IBM problem with ^ as pointer"
+**  *1    25-SEP-1990 13:38:27 BARYIAMES "include file for goldfarb parser"
+**  DEC/CMS REPLACEMENT HISTORY, Element PRSPRE.H
+**
+**  0.01 29-Apr-85
+**   Networks and Communications, Tools
+**
+**  0.02 20-Aug-85
+**   Remove version numbers from extensions.
+**   Put in system specific binary file I/O controls.
+**
+**  0.03 29-Aug-85
+**   Put in system specific file deletion calls.
+**   Put in a default terminator string.
+**--
 */
-/*
- * Program PRS, Module PRSPRE - Prefix file.
- *
- * Copyright (C) 1985 by
- * Digital Equipment Corporation, Maynard, Mass.
- *
- * This software is furnished under a license and may be used and copied
- * only  in  accordance  with  the  terms  of such  license and with the
- * inclusion of the above copyright notice. This software or  any  other
- * copies thereof may not be provided or otherwise made available to any
- * other person. No title to and ownership of  the  software  is  hereby
- * transferred.
- *
- * The information in this software is subject to change without  notice
- * and  should  not be  construed  as  a commitment by Digital Equipment
- * Corporation.
- *
- * Digital assumes no responsibility for the use or  reliability  of its
- * software on equipment which is not supplied by Digital.
- *
- *
- * MODULE DESCRIPTION:
- *
- * Program PRS,  Module PRSPRE
- *
- * Prefix definitions, including binary file record and field definitions.
- *
- *
- * Networks & Communications Software Engineering
- *
- * EDIT HISTORY
- *
- * 0.01	29-Apr-85
- *	Networks and Communications, Tools
- *
- * 0.02	20-Aug-85
- *	Remove version numbers from extensions.
- *	Put in system specific binary file I/O controls.
- *
- * 0.03	29-Aug-85
- *	Put in system specific file deletion calls.
- *	Put in a default terminator string.
- *
- * END EDIT HISTORY
- *
- * MODULE DESCRIPTION:
- *
- * Program PRS,  Module PRSPRE
- *
- * Prefix definitions, including binary file record and field definitions.
- */
 
 /*
  * General definitions.
@@ -112,93 +120,14 @@
 #else
 # define PTR "^"		/*  else use "^" as pointer */
 #endif
-
-
-/*
- * File access definitions
- */
-
-#ifdef vms
-#define SYSTYPE YES             /* System type is known (VMS) */
-#endif
-
-#ifdef decus
-#define SYSTYPE YES             /* System type is known (RSX) */
-#endif
-
-#ifdef unix
-#define SYSTYPE YES             /* System type is known (UNIX) */
-#endif
-
-#ifndef SYSTYPE
-#define other YES               /* System type is not known */
-#endif
-
-#ifdef other                    /* For MS-DOS/ULTRIX binary file I/O, use ... */
-#define FDECL FILE *            /*   standard file pointer */
-#define FOPENB fopen            /*   standard fopen call */
-#define FINP "rb"               /*     read binary */
-#define FOUT "wb"               /*     write binary */
-#define FGETCB fgetc            /*   standard fgetc call */
-#define FPUTCB fputc            /*   standard fputc call */
-#define FCLOSB fclose           /*   standard fclose call */
-#define FDELET unlink           /*   standard unlink (delete) call */
-#endif
-
-#ifdef unix                     /* For UNIX binary file I/O, use ... */
-#define FDECL FILE *            /*   standard file pointer */
-#define FOPENB fopen            /*   standard fopen call */
-#define FINP "r"                /*     read */
-#define FOUT "w"                /*     write */
-#define FGETCB fgetc            /*   standard fgetc call */
-#define FPUTCB fputc            /*   standard fputc call */
-#define FCLOSB fclose           /*   standard fclose call */
-#define FDELET unlink           /*   standard unlink (delete) call */
-#endif
-
-#ifdef decus                    /* For RSX-11M binary file I/O, use ... */
-#define FDECL FILE *            /*   standard file pointer */
-#define FOPENB fopen            /*   standard fopen call */
-#define FINP "rn"               /*     read non-text */
-#define FOUT "wn"               /*     write non-text */
-#define FGETCB getc             /*   DECUS-C getc call */
-#define FPUTCB putc             /*   DECUS-C putc call */
-#define FCLOSB fclose           /*   standard fclose call */
-#define FDELET delete           /*   DECUS-C unlink (delete) call */
-#endif
-
-#ifdef vms                      /* For VMS binary file I/O, use ... */
-#define FDECL int               /*   integer file index */
-#define FOPENB pr_open          /*   special open subroutine */
-#define FINP "r"                /*     read */
-#define FOUT "w"                /*     write */
-#define FGETCB pr_getc          /*   special get char subroutine */
-#define FPUTCB pr_putc          /*   special put char subroutine */
-#define FCLOSB pr_close         /*   special close subroutine */
-#define FDELET delete           /*   VMS unlink (delete) call */
-#endif
 
  /*
  * Parse table conversion definitions
  */
 
-#if defined(other) || defined(unix)
-#define INP_EXT       ".txt"    /* Default extension for source files */
+#define INP_EXT       ".cdt"    /* Default extension for source files */
 #define TMP_EXT       ".tmp"    /* Default extension for temporary files */
 #define OUT_EXT       ".bin"    /* Default extension for output files */
-#endif
-
-#ifdef decus
-#define INP_EXT       ".TXT"    /* Default extension for source files */
-#define TMP_EXT       ".TMP"    /* Default extension for temporary files */
-#define OUT_EXT       ".BIN"    /* Default extension for output files */
-#endif
-
-#ifdef vms
-#define INP_EXT       ".TXT"    /* Default extension for source files */
-#define TMP_EXT       ".TMP"    /* Default extension for temporary files */
-#define OUT_EXT       ".BIN"    /* Default extension for output files */
-#endif
 
 #define INP_MAX		256	/* Max size of an input file record */
 #define OUT_MAX		127	/* Max size of an output file record */
@@ -410,9 +339,3 @@ extern int read_history ();
 #endif /* HAVE_READLINE_HISTORY */
 
 #endif /* _PRSPRE_H */
-
-/*  DEC/CMS REPLACEMENT HISTORY, Element PRSPRE.H */
-/*  *3     8-AUG-1991 16:32:59 COMUZZI "Slight change to last fix" */
-/*  *2     8-AUG-1991 16:15:47 COMUZZI "Fixed IBM problem with ^ as pointer" */
-/*  *1    25-SEP-1990 13:38:27 BARYIAMES "include file for goldfarb parser" */
-/*  DEC/CMS REPLACEMENT HISTORY, Element PRSPRE.H */
