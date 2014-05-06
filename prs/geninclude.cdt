@@ -1,0 +1,61 @@
+!
+! @OSF_COPYRIGHT@
+! COPYRIGHT NOTICE
+! Copyright (c) 1990, 1991, 1992, 1993, 1994, 1996 Open Software Foundation, Inc.
+! ALL RIGHTS RESERVED (DCE).  See the file named COPYRIGHT.DCE for
+! the full copyright text.
+!
+! HISTORY
+! $Log: parser_aid_2.cdt,v $
+! Revision 1.1.6.2  1996/03/09  23:11:44  marty
+! 	Update OSF copyright year
+! 	[1996/03/09  22:29:03  marty]
+!
+! Revision 1.1.6.1  1995/12/08  15:11:14  root
+! 	Submit OSF/DCE 1.2.1
+! 	[1995/12/08  14:40:57  root]
+! 
+! Revision 1.1.4.2  1994/06/09  18:37:36  devsrc
+! 	cr10871 - expand copyright
+! 	[1994/06/09  18:09:35  devsrc]
+! 
+! Revision 1.1.4.1  1994/03/12  22:00:38  peckham
+! 	DEC serviceability and i18n drop
+! 	[1994/03/12  19:30:57  peckham]
+! 
+! Revision 1.1.2.2  1992/12/30  13:08:38  zeliff
+! 	Embedding copyright notices
+! 	[1992/12/29  22:40:22  zeliff]
+! 
+! $EndLog$
+!
+!
+! COPYRIGHT (c) DIGITAL EQUIPMENT CORPORATION 1990-1994. ALL RIGHTS RESERVED.
+!
+! THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND  COPIED
+! ONLY  IN  ACCORDANCE  WITH  THE  TERMS  OF  SUCH  LICENSE AND WITH THE
+! INCLUSION OF THE ABOVE COPYRIGHT NOTICE.  THIS SOFTWARE OR  ANY  OTHER
+! COPIES  THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY
+! OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE  IS  HEREBY
+! TRANSFERRED.
+!
+! THE INFORMATION IN THIS SOFTWARE IS SUBJECT TO CHANGE  WITHOUT  NOTICE
+! AND  SHOULD  NOT  BE  CONSTRUED  AS  A COMMITMENT BY DIGITAL EQUIPMENT
+! CORPORATION.
+!
+! DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE OR  RELIABILITY  OF  ITS
+! SOFTWARE ON EQUIPMENT THAT IS NOT SUPPLIED BY DIGITAL.
+!
+! parser_aid_2.cdt  command definition table for parser aid 2.
+! parser_aid_2 reads .cdt files and writes the names of action routines.
+! the names are then read by parser_aid_1 and made into include files.
+!
+ELEMENT findcall
+CHAR !;*/ SUCCESS
+STRING e  SUCCESS
+WORD call GOTO  callfound
+STRING n  GOTO  findcall
+
+ELEMENT callfound
+STRING ad$_ CALL username SUCCESS
+FORCE SUCCESS
