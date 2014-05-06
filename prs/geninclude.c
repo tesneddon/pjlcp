@@ -99,6 +99,7 @@
 */
 #include <stdio.h>
 #include <string.h>
+#include "fnv.h"
 
 struct itm
     {
@@ -163,7 +164,7 @@ main (
             for (itmp=ht[i].fwd; itmp!=&ht[i]; itmp=itmp->fwd)
                 {
                 /* write the declaration line */
-                fprintf(fpout1, "int %s(struct prs *);\n", itmp->np);
+                fprintf(fpout1, "int %s(void *);\n", itmp->np);
                 /* and the initialization line */
                 fprintf(fpout2, "{%s, \"%s\"},\n", itmp->np, itmp->np);
                 }
@@ -171,7 +172,7 @@ main (
         }
     fclose(fpout1);
     fclose(fpout2);
-    printf("end of parser_aid_2\n");
+    printf("end of geninclude\n");
 
     exit(0);
 }
