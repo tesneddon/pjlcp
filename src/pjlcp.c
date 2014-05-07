@@ -46,6 +46,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "common.h"
+#include "action_routines_decl.h"
 #define RECVBUF_MAX 1024
 
 /*
@@ -64,21 +65,7 @@
 */
 
     static struct action actions[] = {
-        { act_connect,          "act_connect"           },
-        { act_disconnect,       "act_disconnect"        },
-        { act_exit,             "act_exit"              },
-        { act_help,             "act_help"              },
-        { act_is_connected,     "act_is_connected"      },
-        { act_set_flag,         "act_set_flag"          },
-        { act_show_connection,  "act_show_connection"   },
-        { act_show_version,     "act_show_version"      },
-
-        { act_pjl_info,         "act_pjl_info"          },
-        { act_pjl_rol,          "act_pjl_rol"           },
-        { act_pjl_single,       "act_pjl_single"        },
-        { act_pjl_xmit,         "act_pjl_xmit"          },
-        { act_pjl_uel,          "act_pjl_uel"           },
-        { 0,                    0                       },
+#include "action_routines_init.h"
     };
 
 int main(int argc,
@@ -156,6 +143,8 @@ int main(int argc,
                 free(pcb.pjlbuf);
                 pcb.pjlbuf = 0;
             }
+
+            if (pcb.flags2.exit) status = RET_QUIT;
         } while (status != RET_QUIT);
     }
 
