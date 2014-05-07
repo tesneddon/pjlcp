@@ -55,6 +55,7 @@
 **  MODIFICATION HISTORY:
 **
 **      06-May-2014 V1.0    Sneddon   Big tidy up.
+**      06-May-2014 V1.1    Sneddon   Changed to use FNV-1a hash.
 **
 **  Revision 1.1.11.2  1996/02/18  19:30:03  marty
 **      Update OSF copyright years
@@ -72,7 +73,7 @@
 **      Included string.h to pick up retrun type of strtok.
 **      [1994/03/16  21:27:25  jd]
 **
- *  Revision 1.1.8.1  1994/03/12  22:00:36  peckham
+**  Revision 1.1.8.1  1994/03/12  22:00:36  peckham
 **      DEC serviceability and i18n drop
 **      [1994/03/12  14:05:41  peckham]
 **
@@ -97,148 +98,117 @@
 **      Initial revision
 **--
 */
+#define _GNU_SOURCE
+#include <errno.h>
+#include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "fnv.h"
+#define HT_MAX 0xff
+/*
+** Forward definitions
+*/
 
-struct itm
-    {
-    struct itm *fwd;
-    struct itm *bck;
-    char *np;                           /* ptr to the name */
-    };
-
-#define K 3
-
-struct itm ht[K];
+    int main(int argc, char *argv[]);
+    static void pass_1_file(char *name);
+    static void username(char *word);
+    static unsigned hash(char *word);
 
 /*
- * local prototypes
- */
-static void pass_1_file(char *);
+** Own storage
+*/
 
+    static struct itm {
+        struct itm *next;
+        char *np;
+    } *ht[HT_MAX];
 
-int
-main (
-    int argc,                           /* argument count */
-    char *argv[])                       /* ptr to vector of arguments */
-{
+int main(int argc,
+         char *argv[]) {
     FILE *fpout1;                       /* ptr to decl output file */
     FILE *fpout2;                       /* ptr to init output file */
     int i;
 
-    if (argc < 4)
-        {
-        fprintf(stderr,"usage: %s decl_outfile init_outfile infile...\n", argv[0]);
-        exit(2);
-        }
-    else
-        {
-        for (i=0; i<K; i++)
-            {
-            ht[i].fwd = ht[i].bck = &ht[i];     /* init list heads */
-            ht[i].np = NULL;            /* no name for list heads */
-            }
+    if (argc < 4) {
+        fprintf(stderr, "usage: %s decl_outfile init_outfile infile...\n",
+                program_invocation_short_name);
+        exit(EXIT_FAILURE);
+    } else {
+        memset(ht, 0, sizeof(ht));
 
-        for (i=3; i<argc; i++)
-            {
+        for (i = 3; i < argc; i++) {
             pass_1_file(argv[i]);
-            }
+        }
     }
 
     fpout1 = fopen(argv[1], "w");       /* open the decl output file */
     fpout2 = fopen(argv[2], "w");       /* open the init output file */
 
-    if (!fpout1 || !fpout2)
-        {
-        fputs("can not open output file\n", stderr);
+    if (!fpout1 || !fpout2) {
+        fprintf(stderr, "%s: can not open output file(s)\n",
+                program_invocation_short_name);
+        exit(EXIT_FAILURE);
+    } else {
+        for (i = 0; i < HT_MAX; i++) {
+            struct itm *itmp = ht[i];
 
-        exit(1);
-        }
-    else
-        {
-        for (i=0; i<K; i++)
-            {
-            struct itm *itmp;
-
-            for (itmp=ht[i].fwd; itmp!=&ht[i]; itmp=itmp->fwd)
-                {
-                /* write the declaration line */
-                fprintf(fpout1, "int %s(void *);\n", itmp->np);
-                /* and the initialization line */
+            while (itmp != 0) {
+                fprintf(fpout1, "int %s(void *ctx);\n", itmp->np);
                 fprintf(fpout2, "{%s, \"%s\"},\n", itmp->np, itmp->np);
-                }
+                itmp = itmp->next;
             }
         }
+    }
+
     fclose(fpout1);
     fclose(fpout2);
-    printf("end of geninclude\n");
 
-    exit(0);
+    printf("end of %s\n", program_invocation_short_name);
+
+    exit(EXIT_SUCCESS);
 }
 
-static void
-pass_1_file (
-    char *name)
-{
-    char buf[5555];
+static void pass_1_file(char *name) {
+    char buf[5555], *status;
     FILE *fpin = fopen(name, "r");      /* ptr to current input file */
-    char *status;
 
-    while ((status = fgets(buf, sizeof(buf), fpin)) != NULL)
-        {
+    while ((status = fgets(buf, sizeof(buf), fpin)) != NULL) {
         char *s = buf;
-
-        while ((s = strtok(s, " \t")) != NULL)
-            {
-            if (strcasecmp(s, "CALL") == 0)
-                {
-                if ((s = strtok(NULL, ": \t")) == NULL)
-                    break;
-
+        while ((s = strtok(s, " \t")) != NULL) {
+            if (strcasecmp(s, "CALL") == 0) {
+                if ((s = strtok(NULL, ": \t")) == NULL) break;
                 username(s);
-                }
-            s = NULL;
             }
+            s = 0;
         }
+    }
 
     fclose(fpin);
 }
 
-int
-username (
-    const char *word)                   /* ptr to name */
-{
-    const int len = strlen(word);
-    struct itm *p = &ht[hash((unsigned char *)word, len, K)];
-    struct itm *pp;
-    int code = 1;                       /* preset for 0 times thru loop */
+static void username(char *word) {
+    int i = hash(word);
+    struct itm **itmp = &ht[i];
 
-    for (pp=p->fwd; pp != p; pp=pp->fwd)
-        {
-        code = strcmp(word, pp->np);
-        if (code <= 0 ) break;
-        }
+printf("store %s; hash = %d\n", word, i);
 
-    if (code != 0)                      /* 0 means we already have that name */
-        {
-        struct itm *const pnew =        /* get space for the item record */
-            (struct itm *)malloc(sizeof(struct itm));
-        char *const m2 =                /* get space for the name */
-            (char *)malloc(len+1);
+    while (*itmp != 0) {
+        if (strcmp((*itmp)->np, word) == 0) return;
+        itmp = &(*itmp)->next;
+    }
 
-        if (pnew && m2)                 /* did both mallocs work ? */
-            {                           /* yes. */
-            strcpy(m2, word);           /* save the subroutine name */
-            pnew->np = m2;              /* record points to the name */
-            pnew->fwd = pp;             /* new record points to chain */
-            pnew->bck = pp->bck;
-            pp->bck->fwd = pnew;        /* chain points to new record */
-            pp->bck = pnew;
-            }
-        else                            /* at least one malloc failed */
-            {                           /* no clean up. this is just a tool */
-            abort();
-            }
-        }
+    *itmp = calloc(sizeof(struct itm), 1);
+    if (*itmp == 0) raise(SIGSEGV);
+
+    (*itmp)->np = strdup(word);
+    if ((*itmp)->np == 0) raise(SIGSEGV);
+}
+
+unsigned hash(char *str) {
+    Fnv32_t val;
+#define TINY_MASK(x) (((u_int32_t)1<<(x))-1)
+
+    val = fnv_32a_str(str, FNV_32_PRIME);
+    return ((val >> 8) ^ val) & TINY_MASK(8);
 }
