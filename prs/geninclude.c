@@ -191,8 +191,6 @@ static void username(char *word) {
     int i = hash(word);
     struct itm **itmp = &ht[i];
 
-printf("store %s; hash = %d\n", word, i);
-
     while (*itmp != 0) {
         if (strcmp((*itmp)->np, word) == 0) return;
         itmp = &(*itmp)->next;
