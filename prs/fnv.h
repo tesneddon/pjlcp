@@ -117,12 +117,6 @@ typedef u_int32_t Fnv32_t;
 
 
 /*
- * determine how 64 bit unsigned values are represented
- */
-#include "longlong.h"
-
-
-/*
  * 64 bit FNV-0 hash
  */
 #if defined(HAVE_64BIT_LONG_LONG)
