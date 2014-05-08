@@ -2,7 +2,9 @@
 **++
 **  MODULE DESCRIPTION:
 **
-**      This module contains all system commands defined in chapter 9...
+**      This module contains support for all PJL File Systems Commands
+**  described in Chapter 9 of the "Printer Job Language Technical
+**  Reference Manual".
 **
 **  AUTHOR:         Tim E. Sneddon
 **
@@ -29,11 +31,12 @@
 **      01-MAY-2014 V1.0    Sneddon     Initial coding.
 **--
 */
-#define MODULE PJLCP_SYSTEM
+#define MODULE PJLCP_FS
 #define IDENT "V1.0"
 #ifdef __VMS
 # pragma module MODULE IDENT
 #endif
+#include <errno.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,6 +49,12 @@
 
     int act_fsdirlist(void *ctx);
 
+/*
+**++
+**  ...
+**
+**--
+*/
 int act_fsdirlist(void *ctx) {
     static int entry, count, name;
     PCBDEF *pcbp = ctx;
@@ -63,17 +72,17 @@ int act_fsdirlist(void *ctx) {
         switch (pcbp->prs.av2) {
         case KW_NAME:
             name = 1;
-            cat(pcbp->pjlbuf, "NAME=%s", pcbp->prs.cur);
+            pcbp->pjlbuf = cat(pcbp->pjlbuf, "NAME=%s", pcbp->prs.cur);
             break;
 
         case KW_ENTRY:
             entry = 1;
-            cat(pcbp->pjlbuf, "ENTRY=%d", pcbp->prs.num);
+            pcbp->pjlbuf = cat(pcbp->pjlbuf, "ENTRY=%d", pcbp->prs.num);
             break;
 
         case KW_COUNT:
             count = 1;
-            cat(pcbp->pjlbuf, "COUNT=%d", pcbp->prs.num);
+            pcbp->pjlbuf = cat(pcbp->pjlbuf, "COUNT=%d", pcbp->prs.num);
             break;
         }
 
@@ -117,11 +126,16 @@ int act_fsdirlist(void *ctx) {
             error(0, "no pathname specified");
             status = ACT_ERROR;
         } else {
-            if (!entry) cat(pcbp->pjlbuf, "ENTRY=1");
-            if (!count) cat(pcbp->pjlbuf, "COUNT=99");
+            if (!entry) pcbp->pjlbuf = cat(pcbp->pjlbuf, "ENTRY=1");
+            if (!count) pcbp->pjlbuf = cat(pcbp->pjlbuf, "COUNT=99");
         }
+        break;
+
+    default:
+        error(EPERM, "operation not supported by this command");
+        status = ACT_ERROR;
         break;
     }
 
     return status;
-} /* act_pjl_fsdirlist */
+} /* act_fsdirlist */
