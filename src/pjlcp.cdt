@@ -44,11 +44,13 @@ PROMPT "pjlcp> "
     WORD COMMENT MIN 3 CALL act_comment:OP_INIT GOTO comment
     WORD CONNECT MIN 3 GOTO connect
     WORD DISCONNECT MIN 3 CALL act_disconnect GOTO eol
+    WORD ECHO MIN 3 CALL act_echo:OP_INIT GOTO echo
     WORD ENTER MIN 3 CALL act_enter:OP_INIT GOTO enter
     WORD EXIT MIN 3 CALL act_exit GOTO eol
     WORD FSDIRLIST MIN 4 CALL act_fsdirlist:OP_INIT GOTO fsdirlist
     WORD HELP MIN 3 GOTO help    
     WORD INFO MIN 3 CALL act_info:OP_INIT GOTO info
+    WORD PJL MIN 3 CALL act_pjl:OP_FINISH GOTO eol
     WORD QUIT MIN 3 CALL act_exit GOTO eol
     WORD SET MIN 3 GOTO set
     WORD SHOW MIN 2 GOTO show
@@ -75,13 +77,21 @@ ELEMENT *
 ELEMENT *
     FORCE CALL act_connect:0 GOTO eol
 
-! COMMENT remarks...
+! COMMENT [ remarks... ]
 !
 ELEMENT comment
     STRING adsp TERM/KEEP e CALL act_comment:OP_STORE:KW_COMMENT NEXT
     FORCE NEXT
 ELEMENT *
     FORCE CALL act_comment:OP_FINISH GOTO eol
+
+! ECHO [ words... ]
+!
+ELEMENT echo
+    STRING adsp TERM/KEEP e CALL act_echo:OP_STORE:KW_ECHO NEXT
+    FORCE NEXT
+ELEMENT *
+    FORCE CALL act_echo:OP_FINISH GOTO eol
 
 ! ENTER LANGUAGE = personality
 !

@@ -47,7 +47,33 @@
 ** Forward declarations
 */
 
-    int act_pjl_info(void *ctx);
+    int act_echo(void *ctx);
+    int act_info(void *ctx);
+
+int act_echo(void *ctx) {
+    PCBDEF *pcbp = ctx;
+    int status = ACT_SUCCESS;
+
+    switch (pcbp->prs.av1) {
+    case OP_INIT:
+        pcbp->pjlbuf = cat(pcbp->pjlbuf, "ECHO");
+        break;
+
+    case OP_STORE:
+        pcbp->pjlbuf = cat(pcbp->pjlbuf, "%s", pcbp->prs.cur);
+        break;
+
+    case OP_FINISH:
+        break;
+
+    default:
+        error(EPERM, "operation not supported by this command");
+        status = ACT_ERROR;
+        break;
+    }
+
+    return status;
+} /* act_echo */
 
 int act_info(void *ctx) {
     PCBDEF *pcbp = ctx;
