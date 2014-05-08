@@ -76,7 +76,7 @@ do {                                                                    \
     char *newp;                                                         \
     if (asprintf(&newp, "%s " src, dest, ##__VA_ARGS__) == -1)          \
         raise(SIGSEGV);                                                 \
-    free(dest);                                                         \
+    if (dest != 0) free(dest);                                          \
     dest = newp;                                                        \
 } while (0)
 
