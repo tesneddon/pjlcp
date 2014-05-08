@@ -28,6 +28,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <prsdef.h>
+#define PRS_KEYWORDS_EXTERN
 #include "keywords.h"
 #include "operators.h"
 
