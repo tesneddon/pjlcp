@@ -88,7 +88,7 @@ int main(int argc,
         fputs("    extern const char *keywords[];\n", fpout1);
         fputs("#endif /* PREPROCESS_CDT */\n", fpout1);
 
-        fputs("const static char *keywords[] = {\n", fpout2);
+        fputs("const char *keywords[] = {\n", fpout2);
 
         for (i = 0, j = 0; i < HT_MAX; i++) {
             struct itm *itmp = ht[i];
