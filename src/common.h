@@ -18,6 +18,8 @@
 **
 **  You should have received a copy of the GNU General Public License
 **  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+**
+**  08-MAY-2014  Sneddon    Added cat() macro for building PJL commands.
 */
 #ifndef PJLCP_COMMON_H_
 #define PJLCP_COMMON_H_
@@ -25,6 +27,8 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <prsdef.h>
+#include "keywords.h"
+#include "operators.h"
 
 #define DEFAULT_PORT 9100
 
@@ -45,6 +49,9 @@
             unsigned auto_uel : 1;  /* Automatically prefix UEL             */
             unsigned summary : 1;   /* Report network traffic counts        */
         } flags;
+        struct {
+            unsigned exit : 1;      /* Leave gracefully                     */
+        } flags2;
     } PCBDEF;
 
 /*
@@ -77,5 +84,18 @@
 */
 
     int send_pjl(void *ctx, char *buf, int len, int expect_response);
+
+/*
+** Userful macros.
+*/
+
+#define cat(dest, src, ...)                                             \
+do {                                                                    \
+    char *newp;                                                         \
+    if (asprintf(&newp, "%s " src, dest, ##__VA_ARGS__) == -1)          \
+        raise(SIGSEGV);                                                 \
+    free(dest);                                                         \
+    dest = newp;                                                        \
+} while (0)
 
 #endif /* PJLCP_COMMON_H_ */
