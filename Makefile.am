@@ -1,2 +1,2 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = prs src
+SUBDIRS = libfnv prs src

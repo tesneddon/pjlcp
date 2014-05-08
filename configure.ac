@@ -26,6 +26,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_CONFIG_SRCDIR([src/pjlcp.c])
 AC_CONFIG_FILES([Makefile
+                 libfnv/Makefile
                  prs/Makefile
                  src/Makefile])
 
