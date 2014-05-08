@@ -68,16 +68,9 @@
     int send_pjl(void *ctx, char *buf, int len, int expect_response);
 
 /*
-** Userful macros.
+** util.c
 */
 
-#define cat(dest, src, ...)                                             \
-do {                                                                    \
-    char *newp;                                                         \
-    if (asprintf(&newp, "%s " src, dest, ##__VA_ARGS__) == -1)          \
-        raise(SIGSEGV);                                                 \
-    if (dest != 0) free(dest);                                          \
-    dest = newp;                                                        \
-} while (0)
+    char *cat(char *old, char *format, ...);
 
 #endif /* PJLCP_COMMON_H_ */

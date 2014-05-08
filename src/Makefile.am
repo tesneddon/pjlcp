@@ -8,7 +8,7 @@ noinst_PROGRAMS = genkeywords
 genkeywords_SOURCES = genkeywords.c
 genkeywords_LDADD = ../libfnv/libfnv.a
 pjlcp_SOURCES = fs.c help.c message.c misc.c net.c pjl.c pjlcp.c set.c \
-                keywords.c
+                status.c keywords.c util.c
 pjlcp_LDADD = ../prs/libprs.a
 
 # Generate action routine definitions.
