@@ -26,11 +26,12 @@
 **
 **  MODIFICATION HISTORY:
 **
-**      08-MAY-2014 V1.0    Sneddon     Initial coding.
+**      08-MAY-2014 V1.0    Sneddon   Initial coding.
+**      09-MAY-2014 V1.1    Sneddon   Fixed spacing in cat.
 **--
 */
 #define MODULE PJLCP_UTIL
-#define IDENT "V1.0"
+#define IDENT "V1.1"
 #ifdef __VMS
 # pragma module MODULE IDENT
 #endif
@@ -64,7 +65,8 @@ char *cat(char *old,
     /*
     ** Now, append it...
     */
-    status = asprintf(&result, "%s %s", (old == 0) ? "" : old, buf);
+    status = asprintf(&result, "%s%s%s", (old == 0) ? "" : old,
+                      (old == 0) ? "" : " ", buf);
     if (status == -1) raise(SIGSEGV);
 
     /*
