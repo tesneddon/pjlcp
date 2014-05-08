@@ -41,6 +41,7 @@ PROMPT "pjlcp> "
     CHAR ! SUCCESS
     CHAR # SUCCESS
     CHAR ? GOTO help 
+    WORD COMMENT MIN 3 CALL act_comment:OP_INIT GOTO comment
     WORD CONNECT MIN 3 GOTO connect
     WORD DISCONNECT MIN 3 CALL act_disconnect GOTO eol
     WORD ENTER MIN 3 CALL act_enter:OP_INIT GOTO enter
@@ -73,6 +74,14 @@ ELEMENT *
 
 ELEMENT *
     FORCE CALL act_connect:0 GOTO eol
+
+! COMMENT remarks...
+!
+ELEMENT comment
+    STRING adsp TERM/KEEP e CALL act_comment:OP_STORE:KW_COMMENT NEXT
+    FORCE NEXT
+ELEMENT *
+    FORCE CALL act_comment:OP_FINISH GOTO eol
 
 ! ENTER LANGUAGE = personality
 !

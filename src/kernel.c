@@ -46,7 +46,33 @@
 ** Forward declarations
 */
 
+    int act_comment(void *ctx);
     int act_enter(void *ctx);
+
+int act_comment(void *ctx) {
+    PCBDEF *pcbp = ctx;
+    int status = ACT_SUCCESS;
+
+    switch (pcbp->prs.av1) {
+    case OP_INIT:
+        pcbp->pjlbuf = cat(pcbp->pjlbuf, "COMMENT");
+        break;
+
+    case OP_STORE:
+        pcbp->pjlbuf = cat(pcbp->pjlbuf, "%s", pcbp->prs.cur);
+        break;
+
+    case OP_FINISH:
+        break;
+
+    default:
+        error(EPERM, "operation not supported by this command");
+        status = ACT_ERROR;
+        break;
+    }
+
+    return status;
+} /* act_comment */
 
 int act_enter(void *ctx) {
     PCBDEF *pcbp = ctx;
