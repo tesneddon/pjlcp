@@ -20,6 +20,7 @@
 **  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 **
 **  08-MAY-2014  Sneddon    Added cat() macro for building PJL commands.
+**                          Remove actions routines (this is auto-gen'd).
 */
 #ifndef PJLCP_COMMON_H_
 #define PJLCP_COMMON_H_
@@ -53,25 +54,6 @@
             unsigned exit : 1;      /* Leave gracefully                     */
         } flags2;
     } PCBDEF;
-
-/*
-** Action routines
-*/
-
-    int act_connect(void *ctx);
-    int act_disconnect(void *ctx);
-    int act_exit(void *ctx);
-    int act_help(void *ctx);
-    int act_is_connected(void *ctx);
-    int act_set_flag(void *ctx);
-    int act_show_connection(void *ctx);
-    int act_show_version(void *ctx);
-
-    int act_pjl_info(void *ctx);
-    int act_pjl_rol(void *ctx);
-    int act_pjl_single(void *ctx);
-    int act_pjl_uel(void *ctx);
-    int act_pjl_xmit(void *ctx);
 
 /*
 ** main.c
