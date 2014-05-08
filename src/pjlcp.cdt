@@ -27,9 +27,9 @@
 !
 !       01-MAY-2014 V1.0    Sneddon   Initial coding.
 !       08-MAY-2014 V1.1    Sneddon   Defined QUOTE as "".  This will work
-!                                     the same as " in the parser defintiion,
-!                                     but it will also stop cpp from whinging
-!                                     about unterminated strings.
+!                                     the same as a single in the parser
+!                                     defintiion, but it will also stop cpp
+!                                     from whinging about unterminated strings.
 !--
 #include "keywords.h"
 #include "operators.h"
