@@ -105,7 +105,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fnv.h"
-#define HT_MAX 0xff
+#define HT_MAX 256
 /*
 ** Forward definitions
 */
