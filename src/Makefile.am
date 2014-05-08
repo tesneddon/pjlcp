@@ -11,24 +11,29 @@ pjlcp_LDADD = ../prs/libprs.a
 # Generate action routine definitions.
 #
 action_routines_decl.h : pjlcp.cdt
-	../prs/geninclude $@ /dev/null $^
+	@ echo "  GENINC $@"
+	@ ../prs/geninclude $@ /dev/null $^
 
 action_routines_init.h : pjlcp.cdt
-	../prs/geninclude /dev/null $@ $^
+	@ echo "  GENINC $@"
+	@ ../prs/geninclude /dev/null $@ $^
 
 # Generate keyword definitions.
 #
 keywords.h : pjlcp.cdt
-	../prs/genkeywords KW_ $@ /dev/null $<
+	@ echo "  GENKWD $@"
+	@ ../prs/genkeywords KW_ $@ /dev/null $<
 
 keywords.c : pjlcp.cdt
-	../prs/genkeywords KW_ /dev/null $@ $<
+	@ echo "  GENKWD $@"
+	@ ../prs/genkeywords KW_ /dev/null $@ $<
 
 # Default rule for building command definition table.
 #
 pjlcp.bin : pjlcp.cdt keywords.h operators.h
-	cp $< /tmp/a.c
-	$(CPP) -DPREPROCESS_CDT ${INCDIRS} ${CFLAGS} /tmp/a.c > /tmp/a.i
-	../prs/prs /tmp/a.i
-	cp /tmp/a.bin $@
-	rm /tmp/a.*
+	@ echo "  PRS    $@"
+	@ cp $< /tmp/a.c
+	@ $(CPP) -DPREPROCESS_CDT ${INCDIRS} ${CFLAGS} /tmp/a.c > /tmp/a.i
+	@ ../prs/prs /tmp/a.i
+	@ cp /tmp/a.bin $@
+	@ rm /tmp/a.*
