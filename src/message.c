@@ -26,11 +26,12 @@
 **
 **  MODIFICATION HISTORY:
 **
-**      01-MAY-2014 V1.0    Sneddon     Initial coding.
+**      01-MAY-2014 V1.0    Sneddon   Initial coding.
+**      08-MAY-2014 V1.1    Sneddon   Added debug().
 **--
 */
 #define MODULE PJLCP_MESSAGE
-#define IDENT "V1.0"
+#define IDENT "V1.1"
 #ifdef __VMS
 # pragma module MODULE IDENT
 #else
@@ -46,6 +47,7 @@
 ** Forward declarations
 */
 
+    void debug(const char *message, ...);
     void info(const int errnum, const char *message, ...);
     void error(const int errnum, const char *message, ...);
     void warn(const int errnum, const char *message, ...);
@@ -57,6 +59,16 @@
 */
 
     int info_count = 0, error_count = 0, warn_count = 0;
+
+void debug(const char *message,
+           ...) {
+
+    va_list ap;
+
+    va_start(ap, message);
+    output(0, "debug", message, ap);
+    va_end(ap);
+}
 
 void info(const int errnum,
           const char *message,

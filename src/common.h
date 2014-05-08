@@ -63,6 +63,15 @@
     void version(void);
 
 /*
+** message.c
+*/
+
+    void debug(const char *message, ...);
+    void info(const int errnum, const char *message, ...);
+    void error(const int errnum, const char *message, ...);
+    void warn(const int errnum, const char *message, ...);
+
+/*
 ** net.c
 */
 
