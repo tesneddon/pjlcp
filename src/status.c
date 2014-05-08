@@ -85,7 +85,7 @@ int act_info(void *ctx) {
         break;
 
     case OP_STORE:
-        pcbp->pjlbuf = cat(pcbp->pjlbuf, "INFO %s", keywords[pcbp->prs.av1]);
+        pcbp->pjlbuf = cat(pcbp->pjlbuf, "INFO %s", keywords[pcbp->prs.av2]);
         break;
 
     case OP_FINISH:
