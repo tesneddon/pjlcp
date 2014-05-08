@@ -133,8 +133,6 @@ int main(int argc,
     fclose(fpout1);
     fclose(fpout2);
 
-    printf("end of %s\n", program_invocation_short_name);
-
     exit(EXIT_SUCCESS);
 }
 
