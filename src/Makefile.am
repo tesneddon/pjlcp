@@ -7,7 +7,7 @@ bin_PROGRAMS = pjlcp
 noinst_PROGRAMS = genkeywords
 genkeywords_SOURCES = genkeywords.c
 genkeywords_LDADD = ../libfnv/libfnv.a
-pjlcp_SOURCES = help.c message.c misc.c net.c pjl.c pjlcp.c set.c system.c \
+pjlcp_SOURCES = fs.c help.c message.c misc.c net.c pjl.c pjlcp.c set.c \
                 keywords.c
 pjlcp_LDADD = ../prs/libprs.a
 
