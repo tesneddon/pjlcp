@@ -48,6 +48,7 @@
 
     int act_comment(void *ctx);
     int act_enter(void *ctx);
+    int acl_pjl(void *ctx);
 
 int act_comment(void *ctx) {
     PCBDEF *pcbp = ctx;
@@ -55,7 +56,7 @@ int act_comment(void *ctx) {
 
     switch (pcbp->prs.av1) {
     case OP_INIT:
-        pcbp->pjlbuf = cat(pcbp->pjlbuf, "COMMENT");
+        pcbp->pjlbuf = cat(0, "COMMENT");
         break;
 
     case OP_STORE:
@@ -95,3 +96,11 @@ int act_enter(void *ctx) {
 
     return status;
 } /* act_enter */
+
+int act_pjl(void *ctx) {
+    PCBDEF *pcbp = ctx;
+
+    pcbp->pjlbuf = cat(0, " ");
+
+    return ACT_SUCCESS;
+} /* act_pjl */
