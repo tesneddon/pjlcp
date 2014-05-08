@@ -43,6 +43,7 @@ PROMPT "pjlcp> "
     CHAR ? GOTO help 
     WORD CONNECT MIN 3 GOTO connect
     WORD DISCONNECT MIN 3 CALL act_disconnect GOTO eol
+    WORD ENTER MIN 3 CALL act_enter:OP_INIT GOTO enter
     WORD EXIT MIN 3 CALL act_exit GOTO eol
     WORD FSDIRLIST MIN 4 CALL act_fsdirlist:OP_INIT GOTO fsdirlist
     WORD HELP MIN 3 GOTO help    
@@ -72,6 +73,16 @@ ELEMENT *
 
 ELEMENT *
     FORCE CALL act_connect:0 GOTO eol
+
+! ENTER LANGUAGE = personality
+!
+ELEMENT enter
+    WORD LANGUAGE MIN 3 NEXT
+ELEMENT *
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    STRING ad MIN 1 CALL act_enter:OP_STORE:KW_LANGUAGE GOTO eol
 
 ! SET [NO]AUTO_UEL | [NO]SUMMARY | [NO]TIMEOUT=n
 !
