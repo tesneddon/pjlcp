@@ -39,29 +39,23 @@
 #include <stdlib.h>
 #include "common.h"
 
-int act_set_flag(void *ctx) {
+/*
+** Forward declarations
+*/
+
+    int act_eol(void *ctx);
+    int act_exit(void *ctx);
+
+int act_eol(void *ctx) {
     PCBDEF *pcbp = ctx;
 
-    switch (pcbp->prs.av1) {
-    case 0: pcbp->flags.auto_uel = 1; break;
-    case 1: pcbp->flags.auto_uel = 0; break;
-    case 2: pcbp->flags.summary = 1; break;
-    case 3: pcbp->flags.summary = 0; break;
-    }
-
-    return ACT_SUCCESS;
+    error(0, "tailing garbage ignored, /%s/", pcbp->prs.nxt);
+    return ACT_ERROR;
 }
-
-int act_show_version(void *ctx) {
-    PCBDEF *pcbp = ctx;
-
-    version();
-    return ACT_SUCCESS;
-
-} /* act_show_version */
 
 int act_exit(void *ctx) {
     PCBDEF *pcbp = ctx;
 
+    pcbp->flags2.exit = 1;
     return ACT_SUCCESS;
-} /* act_exit */
+}
