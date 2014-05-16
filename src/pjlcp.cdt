@@ -56,14 +56,20 @@ PROMPT "pjlcp> "
     WORD SET MIN 3 GOTO set
     WORD SHOW MIN 2 GOTO show
 
-! HELP [ <command> ]
-!
-ELEMENT help
-    WORD EXIT MIN 3 CALL act_help:1 GOTO eol
-    WORD HELP MIN 3 CALL act_help:2 GOTO eol
-    WORD QUIT MIN 3 CALL act_help:1 GOTO eol
-    FORCE CALL act_help:0 GOTO eol
 
+!=============================================================================
+! COMMENT [ remarks... ]
+!
+ELEMENT comment
+    STRING adsp TERM/KEEP e CALL act_comment:OP_STORE:KW_COMMENT NEXT
+    FORCE NEXT
+ELEMENT *
+    FORCE CALL act_comment:OP_FINISH GOTO eol
+!
+!=============================================================================
+
+
+!=============================================================================
 ! CONNECT <hostname> [ <port> ]
 !
 ELEMENT connect -
@@ -77,15 +83,11 @@ ELEMENT *
 
 ELEMENT *
     FORCE CALL act_connect:OP_FINISH GOTO eol
-
-! COMMENT [ remarks... ]
 !
-ELEMENT comment
-    STRING adsp TERM/KEEP e CALL act_comment:OP_STORE:KW_COMMENT NEXT
-    FORCE NEXT
-ELEMENT *
-    FORCE CALL act_comment:OP_FINISH GOTO eol
+!=============================================================================
 
+
+!=============================================================================
 ! ECHO [ words... ]
 !
 ELEMENT echo
@@ -93,8 +95,12 @@ ELEMENT echo
     FORCE NEXT
 ELEMENT *
     FORCE CALL act_echo:OP_FINISH GOTO eol
+!
+!=============================================================================
 
-! ENTER LANGUAGE = personality
+
+!=============================================================================
+! ENTER LANGUAGE [ = ] personality
 !
 ELEMENT enter
     WORD LANGUAGE MIN 3 NEXT
@@ -104,31 +110,12 @@ ELEMENT *
 ELEMENT *
     STRING ad MIN 1 CALL act_enter:OP_STORE:KW_LANGUAGE GOTO eol
 
-! SET [NO]AUTO_UEL | [NO]SUMMARY | [NO]TIMEOUT=n
 !
-ELEMENT set -
-PROMPT "What? "
-    WORD AUTO_UEL MIN 3 CALL act_set_flag:0 GOTO eol
-    WORD NOAUTO_UEL MIN 4 CALL act_set_flag:1 GOTO eol
-    WORD NOSUMMARY MIN 4 CALL act_set_flag:3 GOTO eol
-    WORD SUMMARY MIN 3 CALL act_set_flag:2 GOTO eol
-    WORD TIMEOUT MIN 3 GOTO set_timeout
-    WORD NOTIMEOUT MIN 4 GOTO eol
+!=============================================================================
 
-ELEMENT set_timeout
-    CHAR = NEXT
-    FORCE NEXT
-ELEMENT *
-    DECIMAL GOTO eol
 
-! SHOW CONNECTION | VERSION
-!
-ELEMENT show -
-PROMPT "What? "
-    WORD CONNECTION MIN 3 CALL act_show_connection GOTO eol
-    WORD VERSION MIN 3 CALL act_show_version GOTO eol
-
-! FSDIRLIST NAME="..." [ ENTRY=n ] [ COUNT=n ]
+!=============================================================================
+! FSDIRLIST NAME [ = ] "..." [ ENTRY [ = ] n ] [ COUNT [ = ]n ]
 !
 ELEMENT fsdirlist
     WORD NAME MIN 2 CALL act_fsdirlist:OP_CHECK:KW_NAME GOTO fsdirlist_name
@@ -153,7 +140,23 @@ ELEMENT fsdirlist_count
     FORCE NEXT
 ELEMENT *
     DECIMAL MIN 1 CALL act_fsdirlist:OP_STORE:KW_COUNT GOTO fsdirlist
+!
+!=============================================================================
 
+
+!=============================================================================
+! HELP [ <command> ]
+!
+ELEMENT help
+    WORD EXIT MIN 3 CALL act_help:1 GOTO eol
+    WORD HELP MIN 3 CALL act_help:2 GOTO eol
+    WORD QUIT MIN 3 CALL act_help:1 GOTO eol
+    FORCE CALL act_help:0 GOTO eol
+!
+!=============================================================================
+
+
+!=============================================================================
 ! INFO [ CONFIG | FILESYS | ID | INFO | MEMORY | PAGECOUNT | STATUS |
 !        USTATUS | VARIABLES ]
 !
@@ -170,8 +173,12 @@ ELEMENT info
     FORCE NEXT
 ELEMENT *
     FORCE CALL act_info:OP_FINISH GOTO eol
+!
+!=============================================================================
 
-! INQUIRE [ LPARM : personality | IPARM : port ] variable
+
+!=============================================================================
+! INQUIRE [ LPARM [ : ] personality | IPARM  [ : ] port ] variable
 !
 ELEMENT inquire
     WORD LPARM MIN 3 GOTO inquire_lparm
@@ -194,7 +201,43 @@ ELEMENT inquire_var
     STRING ad MIN 1 NEXT
 ELEMENT *
     FORCE GOTO eol
+!
+!=============================================================================
 
+
+!=============================================================================
+! SET [NO]AUTO_UEL | [NO]SUMMARY | [NO]TIMEOUT=n
+!
+ELEMENT set -
+PROMPT "What? "
+    WORD AUTO_UEL MIN 3 CALL act_set_flag:0 GOTO eol
+    WORD NOAUTO_UEL MIN 4 CALL act_set_flag:1 GOTO eol
+    WORD NOSUMMARY MIN 4 CALL act_set_flag:3 GOTO eol
+    WORD SUMMARY MIN 3 CALL act_set_flag:2 GOTO eol
+    WORD TIMEOUT MIN 3 GOTO set_timeout
+    WORD NOTIMEOUT MIN 4 GOTO eol
+
+ELEMENT set_timeout
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    DECIMAL GOTO eol
+!
+!=============================================================================
+
+
+!=============================================================================
+! SHOW CONNECTION | VERSION
+!
+ELEMENT show -
+PROMPT "What? "
+    WORD CONNECTION MIN 3 CALL act_show_connection GOTO eol
+    WORD VERSION MIN 3 CALL act_show_version GOTO eol
+!
+!=============================================================================
+
+
+!=============================================================================
 ! Eat up all whitespace until the end of the line.
 !
 ELEMENT eol
@@ -210,4 +253,6 @@ ELEMENT *
     STRING asdp TERM/KEEP QUOTE NEXT
 ELEMENT *
     CHAR QUOTE SUCCESS
+!
+!=============================================================================
 
