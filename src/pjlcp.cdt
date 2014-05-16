@@ -206,16 +206,16 @@ ELEMENT *
 
 
 !=============================================================================
-! SET [NO]AUTO_UEL | [NO]SUMMARY | [NO]TIMEOUT=n
+! SET [NO]AUTO_UEL | [NO]SUMMARY | [NO]TIMEOUT [ = ] n
 !
 ELEMENT set -
 PROMPT "What? "
-    WORD AUTO_UEL MIN 3 CALL act_set:0 GOTO eol
-    WORD NOAUTO_UEL MIN 4 CALL act_set:1 GOTO eol
-    WORD NOSUMMARY MIN 4 CALL act_set:2 GOTO eol
-    WORD SUMMARY MIN 3 CALL act_set:3 GOTO eol
+    WORD AUTO_UEL MIN 3 CALL act_set:OP_STORE:0 GOTO eol
+    WORD NOAUTO_UEL MIN 4 CALL act_set:OP_STORE:1 GOTO eol
+    WORD NOSUMMARY MIN 4 CALL act_set:OP_STORE:3 GOTO eol
+    WORD SUMMARY MIN 3 CALL act_set:OP_STORE:2 GOTO eol
     WORD TIMEOUT MIN 3 GOTO set_timeout
-    WORD NOTIMEOUT MIN 4 GOTO eol
+    WORD NOTIMEOUT MIN 4 CALL act_set:OP_STORE:5 GOTO eol
 
 ELEMENT set_timeout
     CHAR = NEXT
@@ -232,7 +232,7 @@ ELEMENT *
 ELEMENT show -
 PROMPT "What? "
     WORD CONNECTION MIN 3 CALL act_show_connection GOTO eol
-    WORD VERSION MIN 3 CALL act_show:0 GOTO eol
+    WORD VERSION MIN 3 CALL act_show:OP_FETCH:0 GOTO eol
 !
 !=============================================================================
 

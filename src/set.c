@@ -53,11 +53,12 @@ int act_set(void *ctx) {
     switch (pcbp->prs.av1) {
     case OP_STORE:
         switch (pcbp->prs.av2) {
-        case 0: pcbp->flags.auto_uel = 1; break;
-        case 1: pcbp->flags.auto_uel = 0; break;
-        case 2: pcbp->flags.summary = 1; break;
-        case 3: pcbp->flags.summary = 0; break;
-        case 4: pcbp->timeout = pcbp->prs.num; break;
+        case 0 /*   AUTO_UEL */: pcbp->flags.auto_uel = 1; break;
+        case 1 /* NOAUTO_UEL */: pcbp->flags.auto_uel = 0; break;
+        case 2 /*   SUMMARY  */: pcbp->flags.summary = 1; break;
+        case 3 /* NOSUMMARY  */: pcbp->flags.summary = 0; break;
+        case 4 /*   TIMEOUT=n*/: pcbp->timeout = pcbp->prs.num; break;
+        case 5 /* NOTIMEOUT  */: pcbp->timeout = 0; break;
         }
         break;
 
