@@ -116,6 +116,21 @@ int main(int argc,
             status = pr_command(&pcb.prs);
             switch (status) {
             case RET_SUCCESS:
+                if (pcb.flags2.send_pjl) {
+                    if (pcb.sock == -1) {
+                        error(ENOTCONN, "cannot send command to printer");
+                    } else {
+                        debug("%s@PJL %s \\r\\n]",
+                              pcb.flags.auto_uel ? "[ESC]%%-12345X" : "",
+                              pcb.pjlbuf == 0 ? "" : pcb.pjlbuf);
+                    }
+
+                    pcb.flags2.send_pjl = 0;
+                }
+//                    asprintf(&out, "%s@PJL %s\r\n",
+  //                           pcb.flags.auto_uel ? "\033%%X12345", "",
+    //                         pcb.pjlbuf);
+
                 break;
 
             case RET_EOF:
@@ -143,7 +158,6 @@ int main(int argc,
                 free(pcb.pjlbuf);
                 pcb.pjlbuf = 0;
             }
-
             if (pcb.flags2.exit) status = RET_QUIT;
         } while (status != RET_QUIT);
     }

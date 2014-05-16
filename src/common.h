@@ -47,12 +47,13 @@
         struct sockaddr_in addr;    /* Socket address                       */
         int sock;                   /* Active connection socket (-1 if not) */
         unsigned int wcnt, rcnt;    /* Read/write byte count                */
-        struct {
+        struct {                    /* User configurable options.           */
             unsigned auto_uel : 1;  /* Automatically prefix UEL             */
             unsigned summary : 1;   /* Report network traffic counts        */
         } flags;
-        struct {
+        struct {                    /* Internal flags                       */
             unsigned exit : 1;      /* Leave gracefully                     */
+            unsigned send_pjl : 1;  /* Transmit contents of pjlbuf          */
         } flags2;
     } PCBDEF;
 

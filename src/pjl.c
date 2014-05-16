@@ -98,28 +98,11 @@ int act_pjl_single(void *ctx) {
     return ACT_SUCCESS;
 } /* act_pjl_single */
 
-int act_pjl_xmit(void *ctx) {
-    PCBDEF *pcbp = ctx;
-
-    switch (pcbp->prs.av1) {
-    case 0:             /* No response */
-        send_pjl(ctx, pcbp->pjlbuf, strlen(pcbp->pjlbuf), 0);
-        break;
-
-    case 1:             /* Expect response */
-        send_pjl(ctx, pcbp->pjlbuf, strlen(pcbp->pjlbuf), 1);
-        break;
-    }
-
-    return ACT_SUCCESS;
-} /* act_pjl_xmit */
-
 int act_pjl_uel(void *ctx) {
     PCBDEF *pcbp = ctx;
     int auto_uel = pcbp->flags.auto_uel;
 
     pcbp->flags.auto_uel = 1;
-    send_pjl(ctx, 0, 0, 0);
     pcbp->flags.auto_uel = auto_uel;
 
     return ACT_SUCCESS;

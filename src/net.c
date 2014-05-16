@@ -79,7 +79,7 @@ int act_connect(void *ctx) {
             break;
 
         case 1:         /* Store numeric port number */
-            pcbp->port = DEFAULT_PORT;
+            pcbp->port = pcbp->prs.num;
             break;
 
         case 2: {       /* Store named port number */\
@@ -162,6 +162,10 @@ int act_connect(void *ctx) {
         break;
     }
 
+    default:
+        error(EPERM, "operation not supported by this command");
+        status = ACT_ERROR;
+        break;
     }
 
     return status;

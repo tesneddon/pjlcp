@@ -64,6 +64,7 @@ int act_comment(void *ctx) {
         break;
 
     case OP_FINISH:
+        pcbp->flags2.send_pjl = 1;
         break;
 
     default:
@@ -85,7 +86,10 @@ int act_enter(void *ctx) {
                            pcbp->prs.cur);
 
     case OP_INIT:
+        break;
+
     case OP_FINISH:
+        pcbp->flags2.send_pjl = 1;
         break;
 
     default:
@@ -100,7 +104,6 @@ int act_enter(void *ctx) {
 int act_pjl(void *ctx) {
     PCBDEF *pcbp = ctx;
 
-    pcbp->pjlbuf = cat(0, " ");
-
+    pcbp->flags2.send_pjl = 1;
     return ACT_SUCCESS;
 } /* act_pjl */

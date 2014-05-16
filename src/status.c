@@ -64,6 +64,7 @@ int act_echo(void *ctx) {
         break;
 
     case OP_FINISH:
+        pcbp->flags2.send_pjl = 1;
         break;
 
     default:
@@ -92,6 +93,7 @@ int act_info(void *ctx) {
         if (pcbp->pjlbuf == 0) {
             pcbp->pjlbuf = cat(pcbp->pjlbuf, "INFO ID");
         }
+        pcbp->flags2.send_pjl = 1;
         break;
 
     default:
