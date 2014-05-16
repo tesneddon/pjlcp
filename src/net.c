@@ -82,7 +82,7 @@ int act_connect(void *ctx) {
             pcbp->port = DEFAULT_PORT;
             break;
 
-        case 3: {       /* Store named port number */\
+        case 2: {       /* Store named port number */\
             struct servent *entry;
             char *name;
 
