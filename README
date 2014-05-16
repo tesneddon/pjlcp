@@ -1,0 +1,6 @@
+HP Printer Job Language Control Program
+
+This utility program is based on a software package originaly developed
+for OpenVMS, first in C and then in BLISS using LIB$T[ABLE_]PARSE.  This
+version is written entirely in C using the PRS parser package and is
+targeted ad UNIX-like systems.
