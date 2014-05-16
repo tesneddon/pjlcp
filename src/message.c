@@ -28,10 +28,12 @@
 **
 **      01-MAY-2014 V1.0    Sneddon   Initial coding.
 **      08-MAY-2014 V1.1    Sneddon   Added debug().
+**      16-MAY-2014 V1.2    Sneddon   Make first character from strerror
+**                                    lowercase (looks better).
 **--
 */
 #define MODULE PJLCP_MESSAGE
-#define IDENT "V1.1"
+#define IDENT "V1.2"
 #ifdef __VMS
 # pragma module MODULE IDENT
 #else
@@ -124,6 +126,8 @@ static void output(int errnum,
         vfprintf(stderr, message, ap);
     }
     if (errnum != 0) {
+        char *errstr = strerror(errnum);
+
         /*
         ** Also output the error message from the system.
         */
@@ -134,7 +138,12 @@ static void output(int errnum,
             */
             fputs(", ", stderr);
         }
-        fputs(strerror(errnum), stderr);
+        /*
+        ** This might seem odd, but it makes sure that the first character
+        ** of the string from strerror starts with a lowercase character, os
+        ** that the error message look neater.
+        */
+        fprintf(stderr, "%c%s", tolower(errstr[0]), &errstr[1]);
     }
     fputc('\n', stderr);
 }
