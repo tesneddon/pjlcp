@@ -49,7 +49,7 @@
 int act_eol(void *ctx) {
     PCBDEF *pcbp = ctx;
 
-    error(0, "tailing garbage ignored, /%s/", pcbp->prs.nxt);
+    warn(0, "tailing garbage ignored\n \\%s\\", pcbp->prs.cur);
     return ACT_ERROR;
 }
 

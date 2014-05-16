@@ -200,7 +200,7 @@ ELEMENT *
 ELEMENT eol
     STRING s GOTO eol
     CHAR e SUCCESS
-    FORCE ERROR
+    FORCE CALL act_eol ERROR
 
 ! Parse a quoted string.
 !
