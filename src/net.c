@@ -51,24 +51,59 @@
 
     int act_connect(void *ctx);
     int act_disconnect(void *ctx);
-    int act_is_connected(void *ctx);
     int act_show_connection(void *ctx);
     int send_pjl(void *ctx, char *buf, int len, int expect_response);
 
 int act_connect(void *ctx) {
 
     PCBDEF *pcbp = ctx;
-    char *ptr;
-    size_t len;
     int status = ACT_SUCCESS;
 
-    if (pcbp->sock != -1) {
-        error(EISCONN, "cannot open connection");
-        return ACT_ERROR;
-    }
-
     switch (pcbp->prs.av1) {
-    case 0: {        /* Make the connection */
+    case OP_INIT:       /* Initialize storage */
+        if (pcbp->sock != -1) {
+            error(EISCONN, "cannot open connection");
+            status = ACT_ERROR;
+        } else {
+            pcbp->hostname = 0;
+            pcbp->port = DEFAULT_PORT;
+        }
+        break;
+
+    case OP_STORE:      /* Store value from command line parse */
+        switch (pcbp->prs.av2) {
+        case 0:         /* Store hostname */
+            pcbp->hostname = strndup(pcbp->prs.cur,
+                                     pcbp->prs.end-pcbp->prs.cur);
+            if (pcbp->hostname == 0) raise(SIGSEGV);
+            break;
+
+        case 1:         /* Store numeric port number */
+            pcbp->port = DEFAULT_PORT;
+            break;
+
+        case 3: {       /* Store named port number */\
+            struct servent *entry;
+            char *name;
+
+            name = strndup(pcbp->prs.cur, pcbp->prs.end-pcbp->prs.cur);
+            if (name == 0) raise(SIGSEGV);
+
+            entry = getservbyname(name, 0);
+            if (entry == 0) {
+                error(0, "unable to translate service name '%s'", name);
+                status = ACT_ERROR;
+            } else {
+                pcbp->port = ntohs(entry->s_port);
+            }
+            free(name);
+            break;
+        }
+
+        }
+        break;
+
+    case OP_FINISH: {   /* Make the connection */
         struct hostent *entry;
 
         entry = gethostbyname(pcbp->hostname);
@@ -86,7 +121,8 @@ int act_connect(void *ctx) {
                 pcbp->addr.sin_family = AF_INET;
                 pcbp->addr.sin_port = htons(pcbp->port);
                 for (i = 0; entry->h_addr_list[i] != 0; i++) {
-                    pcbp->addr.sin_addr.s_addr = *(in_addr_t *) entry->h_addr_list[i];
+                    pcbp->addr.sin_addr.s_addr =
+                                        *(in_addr_t *) entry->h_addr_list[i];
                     status = connect(pcbp->sock,
                                      (struct sockaddr *)&pcbp->addr,
                                      sizeof(pcbp->addr));
@@ -126,37 +162,6 @@ int act_connect(void *ctx) {
         break;
     }
 
-    case 1:         /* Store the hostname */
-        ptr = pcbp->prs.cur;
-        len = pcbp->prs.end - pcbp->prs.cur;
-
-        pcbp->hostname = strndup(ptr, len);;
-        if (pcbp->hostname == 0) raise(SIGSEGV);
-        pcbp->port = DEFAULT_PORT;
-        break;
-
-    case 2:         /* Store an integer port number */
-        pcbp->port = (unsigned short) pcbp->prs.num;
-        break;
-
-    case 3: {        /* Store service name */
-        struct servent *entry;
-
-        len = pcbp->prs.end - pcbp->prs.cur;
-        ptr = strndup(pcbp->prs.cur, len);
-        if (ptr == 0) raise(SIGSEGV);
-
-        entry = getservbyname(ptr, 0);
-        if (entry == 0) {
-            error(0, "unable to translate service name '%s'", ptr);
-            status = ACT_ERROR;
-        } else {
-            pcbp->port = ntohs(entry->s_port);
-        }
-        free(ptr);
-        break;
-    }
-
     }
 
     return status;
@@ -178,18 +183,6 @@ int act_disconnect(void *ctx) {
     return ACT_SUCCESS;
 } /* act_disconnect */
 
-int act_is_connected(void *ctx) {
-    PCBDEF *pcbp = ctx;
-    int status = ACT_SUCCESS;
-
-    if (pcbp->sock == -1) {
-        error(ENOTCONN, "cannot execute PJL commands");
-        status = ACT_ERROR;
-    }
-
-    return status;
-}
-
 int act_show_connection(void *ctx) {
 
     PCBDEF *pcbp = ctx;
@@ -204,42 +197,3 @@ int act_show_connection(void *ctx) {
 
     return ACT_SUCCESS;
 } /* act_show_connection */
-
-int send_pjl(void *ctx,
-             char *cmd,
-             int cmdlen,
-             int expect_response) {
-
-    static const char uel[] = "\033%-12345X";
-    PCBDEF *pcbp = ctx;
-    char *buf = 0;
-    int count, len, status = ACT_ERROR;
-
-    len = asprintf(&buf, "%s@PJL %-*.*s\r\n",
-                   pcbp->flags.auto_uel ? uel : "", cmdlen, cmdlen, cmd);
-    if (len == -1) raise(SIGSEGV);
-
-    count = send(pcbp->sock, buf, len, 0);
-    if (count != len) {
-        error(errno, "failed to send PJL command sequence");
-    } else {
-        // ?
-        char rbuf[2048];
-
-        count = recv(pcbp->sock, rbuf, sizeof(rbuf), 0);
-
-        fprintf(stdout, "%-*.*s", count-1,count-1,rbuf);
-
-
-        // loop
-            // recv
-            // if last char == FF
-                // break
-            // else
-                // go round again
-    }
-
-    free(buf);
-
-    return status;
-} /* send_pjl */

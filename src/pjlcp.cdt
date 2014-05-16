@@ -42,7 +42,7 @@ PROMPT "pjlcp> "
     CHAR # SUCCESS
     CHAR ? GOTO help 
     WORD COMMENT MIN 3 CALL act_comment:OP_INIT GOTO comment
-    WORD CONNECT MIN 3 GOTO connect
+    WORD CONNECT MIN 3 CALL act_connect:OP_INIT GOTO connect
     WORD DISCONNECT MIN 3 CALL act_disconnect GOTO eol
     WORD ECHO MIN 3 CALL act_echo:OP_INIT GOTO echo
     WORD ENTER MIN 3 CALL act_enter:OP_INIT GOTO enter
@@ -68,15 +68,15 @@ ELEMENT help
 !
 ELEMENT connect -
 PROMPT "Where? "
-    STRING ad.-_ MIN 1 CALL act_connect:1 NEXT
+    STRING ad.-_ MIN 1 CALL act_connect:OP_STORE:0 NEXT
 
 ELEMENT *
-    DECIMAL CALL act_connect:2 NEXT
-    STRING ad-_ MIN 1 CALL act_connect:3 NEXT
+    DECIMAL CALL act_connect:OP_STORE:1 NEXT
+    STRING ad-_ MIN 1 CALL act_connect:OP_STORE:2 NEXT
     FORCE NEXT
 
 ELEMENT *
-    FORCE CALL act_connect:0 GOTO eol
+    FORCE CALL act_connect:OP_FINISH GOTO eol
 
 ! COMMENT [ remarks... ]
 !
