@@ -124,8 +124,6 @@ int main(int argc,
                               pcb.flags.auto_uel ? "[ESC]%%-12345X" : "",
                               pcb.pjlbuf == 0 ? "" : pcb.pjlbuf);
                     }
-
-                    pcb.flags2.send_pjl = 0;
                 }
 //                    asprintf(&out, "%s@PJL %s\r\n",
   //                           pcb.flags.auto_uel ? "\033%%X12345", "",
@@ -158,6 +156,7 @@ int main(int argc,
                 free(pcb.pjlbuf);
                 pcb.pjlbuf = 0;
             }
+            pcb.flags2.send_pjl = 0;
             if (pcb.flags2.exit) status = RET_QUIT;
         } while (status != RET_QUIT);
     }
