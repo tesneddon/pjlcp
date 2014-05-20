@@ -31,8 +31,8 @@
 !                                     defintiion, but it will also stop cpp
 !                                     from whinging about unterminated strings.
 !       20-MAY-2014 V1.2    Sneddon   Modify SHOW CONNECTION. Add SET DUMP.
-!       21-MAY-2014 V1.3    Sneddon   Add FSDELETE, FSMKDIR, FSQUERY, OPMSG,
-!                                     RDYMSG, STMSG.
+!       21-MAY-2014 V1.3    Sneddon   Add FSDELETE, FSMKDIR, FSUPLOAD, FSQUERY,
+!                                     OPMSG, RDYMSG, STMSG.
 !--
 #include "keywords.h"
 #include "operators.h"
@@ -54,6 +54,7 @@ PROMPT "pjlcp> "
     WORD FSDIRLIST MIN 4 CALL act_fsdirlist:OP_INIT GOTO fsdirlist
     WORD FSMKDIR MIN 4 CALL act_fsmkdir:OP_INIT GOTO fsmkdir
     WORD FSQUERY MIN 4 CALL act_fsquery:OP_INIT GOTO fsquery
+    WORD FSUPLOAD MIN 4 CALL act_fsupload:OP_INIT GOTO fsupload
     WORD HELP MIN 3 GOTO help    
     WORD INFO MIN 3 CALL act_info:OP_INIT GOTO info
     WORD INQUIRE MIN 3 GOTO inquire
@@ -200,6 +201,36 @@ ELEMENT *
     GOSUB parse_string CALL act_fsquery:OP_STORE:KW_NAME NEXT
 ELEMENT *
     FORCE CALL act_fsquery:OP_FINISH GOTO eol
+!
+!=============================================================================
+
+
+!=============================================================================
+! FSUPLOAD NAME [ = ] "pathname" [ OFFSET [ = ] n ] [ SIZE [ = ] n ]
+!
+ELEMENT fsupload
+    WORD NAME MIN 2 CALL act_fsupload:OP_CHECK:KW_NAME GOTO fsupload_name
+    WORD OFFSET MIN 2 CALL act_fsupload:OP_CHECK:KW_OFFSET GOTO fsupload_offset
+    WORD SIZE MIN 2 CALL act_fsupload:OP_CHECK:KW_SIZE GOTO fsupload_size
+    FORCE CALL act_fsupload:OP_FINISH GOTO eol
+
+ELEMENT fsupload_name
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    GOSUB parse_string CALL act_fsupload:OP_STORE:KW_NAME GOTO fsdirlist
+
+ELEMENT fsupload_offset
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    DECIMAL MIN 1 CALL act_fsupload:OP_STORE:KW_OFFSET GOTO fsupload
+
+ELEMENT fsupload_size
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    DECIMAL MIN 1 CALL act_fsupload:OP_STORE:KW_SIZE GOTO fsupload
 !
 !=============================================================================
 

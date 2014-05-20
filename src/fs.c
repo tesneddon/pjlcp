@@ -53,6 +53,7 @@
     int act_fsdirlist(void *ctx);
     int act_fsmkdir(void *ctx);
     int act_fsquery(void *ctx);
+    int act_upload(void *ctx);
 
 int act_fsdelete(void *ctx) {
     PCBDEF *pcbp = ctx;
@@ -269,3 +270,93 @@ int act_fsquery(void *ctx) {
 
     return status;
 } /* act_fsquery */
+
+int act_fsupload(void *ctx) {
+    static int offset, size, name;
+    PCBDEF *pcbp = ctx;
+    int status = ACT_SUCCESS;
+
+    switch (pcbp->prs.av1) {
+    case OP_INIT:
+        name = offset = size = 0;
+        pcbp->pjlbuf = strdup("FSUPLOAD");
+        if (pcbp->pjlbuf == 0) raise(SIGSEGV);
+
+        break;
+
+    case OP_STORE:
+        switch (pcbp->prs.av2) {
+        case KW_NAME: {
+            const int len = pcbp->prs.end - pcbp->prs.cur;
+
+            name = 1;
+            pcbp->pjlbuf = cat(pcbp->pjlbuf, "NAME=%-*.*s",
+                               len, len, pcbp->prs.cur);
+            break;
+        }
+
+        case KW_OFFSET:
+            offset = 1;
+            pcbp->pjlbuf = cat(pcbp->pjlbuf, "OFFSET=%d", pcbp->prs.num);
+            break;
+
+        case KW_SIZE:
+            size = 1;
+            pcbp->pjlbuf = cat(pcbp->pjlbuf, "SIZE=%d", pcbp->prs.num);
+            break;
+        }
+
+        break;
+
+    case OP_CHECK: {
+        char *field = 0;
+
+        switch (pcbp->prs.av2) {
+        case KW_NAME:
+            if (name) {
+                field = "NAME";
+                status = ACT_ERROR;
+            }
+            break;
+
+        case KW_OFFSET:
+            if (offset) {
+                field = "OFFSET";
+                status = ACT_ERROR;
+            }
+            break;
+
+        case KW_SIZE:
+            if (size) {
+                field = "SIZE";
+                status = ACT_ERROR;
+            }
+            break;
+        }
+
+        if (status == ACT_ERROR) {
+            error(0, "'%s' argument can only appear once", field);
+        }
+
+        break;
+    }
+
+    case OP_FINISH:
+        if (!name) {
+            error(0, "no pathname specified");
+            status = ACT_ERROR;
+        } else {
+            if (!offset) pcbp->pjlbuf = cat(pcbp->pjlbuf, "OFFSET=0");
+            if (!size) pcbp->pjlbuf = cat(pcbp->pjlbuf, "SIZE=9999");
+            pcbp->flags2.send_pjl = pcbp->flags2.expect_ack = 1;
+        }
+        break;
+
+    default:
+        error(EPERM, "operation not supported by this command");
+        status = ACT_ERROR;
+        break;
+    }
+
+    return status;
+} /* act_fsupload */
