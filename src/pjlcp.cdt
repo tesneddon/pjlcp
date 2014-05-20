@@ -31,7 +31,7 @@
 !                                     defintiion, but it will also stop cpp
 !                                     from whinging about unterminated strings.
 !       20-MAY-2014 V1.2    Sneddon   Modify SHOW CONNECTION. Add SET DUMP.
-!       21-MAY-2014 V1.3    Sneddon   Add OPMSG, RDYMSG, STMSG.
+!       21-MAY-2014 V1.3    Sneddon   Add FSQUERY, OPMSG, RDYMSG, STMSG.
 !--
 #include "keywords.h"
 #include "operators.h"
@@ -50,6 +50,7 @@ PROMPT "pjlcp> "
     WORD ENTER MIN 3 CALL act_enter:OP_INIT GOTO enter
     WORD EXIT MIN 3 CALL act_exit GOTO eol
     WORD FSDIRLIST MIN 4 CALL act_fsdirlist:OP_INIT GOTO fsdirlist
+    WORD FSQUERY MIN 4 CALL act_fsquery:OP_INIT GOTO fsquery
     WORD HELP MIN 3 GOTO help    
     WORD INFO MIN 3 CALL act_info:OP_INIT GOTO info
     WORD INQUIRE MIN 3 GOTO inquire
@@ -148,6 +149,22 @@ ELEMENT fsdirlist_count
     FORCE NEXT
 ELEMENT *
     DECIMAL MIN 1 CALL act_fsdirlist:OP_STORE:KW_COUNT GOTO fsdirlist
+!
+!=============================================================================
+
+
+!=============================================================================
+! FSQUERY NAME [ = ] "pathanme"
+!
+ELEMENT fsquery
+    WORD NAME MIN 2 NEXT
+ELEMENT *
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    GOSUB parse_string CALL act_fsquery:OP_STORE:KW_NAME NEXT
+ELEMENT *
+    FORCE CALL act_fsquery:OP_FINISH GOTO eol
 !
 !=============================================================================
 

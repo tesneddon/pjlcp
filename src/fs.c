@@ -49,6 +49,7 @@
 */
 
     int act_fsdirlist(void *ctx);
+    int act_fsquery(void *ctx);
 
 /*
 **++
@@ -145,3 +146,43 @@ int act_fsdirlist(void *ctx) {
 
     return status;
 } /* act_fsdirlist */
+
+int act_fsquery(void *ctx) {
+    PCBDEF *pcbp = ctx;
+    int status = ACT_SUCCESS;
+
+    switch (pcbp->prs.av1) {
+    case OP_INIT:
+        pcbp->pjlbuf = strdup("FSQUERY");
+        if (pcbp->pjlbuf == 0) raise(SIGSEGV);
+
+        break;
+
+    case OP_STORE:
+        switch (pcbp->prs.av2) {
+        case KW_NAME: {
+            const int len = pcbp->prs.end - pcbp->prs.cur;
+
+            pcbp->pjlbuf = cat(pcbp->pjlbuf, "NAME=%-*.*s",
+                               len, len, pcbp->prs.cur);
+            break;
+        }
+
+        default:
+            break;
+        }
+
+        break;
+
+    case OP_FINISH:
+        pcbp->flags2.send_pjl = pcbp->flags2.expect_ack = 1;
+        break;
+
+    default:
+        error(EPERM, "operation not supported by this command");
+        status = ACT_ERROR;
+        break;
+    }
+
+    return status;
+} /* act_fsquery */
