@@ -128,7 +128,7 @@ int act_fsdirlist(void *ctx) {
         } else {
             if (!entry) pcbp->pjlbuf = cat(pcbp->pjlbuf, "ENTRY=1");
             if (!count) pcbp->pjlbuf = cat(pcbp->pjlbuf, "COUNT=99");
-            pcbp->flags2.send_pjl = 1;
+            pcbp->flags2.send_pjl = pcbp->flags2.expect_ack = 1;
         }
         break;
 
