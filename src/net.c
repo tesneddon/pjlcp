@@ -27,10 +27,12 @@
 **  MODIFICATION HISTORY:
 **
 **      01-MAY-2014 V1.0    Sneddon     Initial coding.
+**      20-MAY-2014 V1.1    Sneddon     Removed SHOW CONNECTION.  Add init
+**                                      of I/O counters.
 **--
 */
 #define MODULE PJLCP_NET
-#define IDENT "V1.0"
+#define IDENT "V1.1"
 #ifdef __VMS
 # pragma module MODULE IDENT
 #endif
@@ -65,6 +67,7 @@ int act_connect(void *ctx) {
             error(EISCONN, "cannot open connection");
             status = ACT_ERROR;
         } else {
+            pcbp->rcnt = pcbp->wcnt = 0;
             pcbp->hostname = 0;
             pcbp->port = DEFAULT_PORT;
         }
@@ -186,18 +189,3 @@ int act_disconnect(void *ctx) {
 
     return ACT_SUCCESS;
 } /* act_disconnect */
-
-int act_show_connection(void *ctx) {
-
-    PCBDEF *pcbp = ctx;
-
-    if (pcbp->sock == -1) {
-        error(ENOTCONN, 0);
-        return ACT_ERROR;
-    }
-
-    fprintf(stdout, "Connected to %s:%d\n", pcbp->hostname, pcbp->port);
-
-
-    return ACT_SUCCESS;
-} /* act_show_connection */

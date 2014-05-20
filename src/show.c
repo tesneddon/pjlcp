@@ -28,10 +28,11 @@
 **  MODIFICATION HISTORY:
 **
 **      16-MAY-2014 V1.0    Sneddon     Initial coding.
+**      20-MAY-2014 V1.1    Sneddon     Add SHOW CONNECTION.
 **--
 */
 #define MODULE PJLCP_SHOW
-#define IDENT "V1.0"
+#define IDENT "V1.1"
 #ifdef __VMS
 # pragma module MODULE IDENT
 #endif
@@ -53,9 +54,27 @@ int act_show(void *ctx) {
     switch (pcbp->prs.av1) {
     case OP_FETCH:
         switch (pcbp->prs.av2) {
-        case 0:
+        case 0:                         /* SHOW CONNECTION */
+            if (pcbp->sock == -1) {
+                error(ENOTCONN, 0);
+                status = ACT_ERROR;
+            } else {
+                fprintf(stdout,"\
+\n\
+Current connection:\n\
+\n\
+  Host: %s Port: %d\n\
+  CPU time:              Connect time:\n\
+  Bytes\n\
+    sent: %d received: %d\n", pcbp->hostname, pcbp->port, pcbp->wcnt,
+                              pcbp->rcnt);
+            }
+            break;
+
+        case 1:                         /* SHOW VERSION */
             version();
             break;
+
         }
         break;
 
