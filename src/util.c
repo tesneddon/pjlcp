@@ -103,25 +103,27 @@ void dump(FILE *file,
 
     fprintf(out, ">Record    (%d bytes)\n", buflen);
     for (i = 0; i < buflen; i += j) {
+        int jmax = i + 16;
+
         fputs("  [", out);
 
-        for (j = i; j < (i + 16); j++) {
+        for (j = i; j < jmax; j++) {
             char c = buf[j];
 
-            if (j >= buflen) {
-                fputc(' ', out);
-            } else {
+            if (j < buflen) {
                 fputc(isprint(c) ? c : '.', out);
+            } else {
+                fputc(' ', out);
             }
         }
 
         fprintf(out, "]-%5d-[", i);
 
-        for (j = i; (j < buflen) && (j < (i + 16)); j++) {
+        for (j = i; (j < jmax) && (j < buflen); j++) {
             char c = buf[j];
 
-            fprintf(out, "%02x", c);
-            if ((j + 1) < buflen) fputc(' ', out);
+            fprintf(out, "%02X", c);
+            if ((j + 1) < jmax) fputc(' ', out);
         }
 
         fputs("]\n", out);
