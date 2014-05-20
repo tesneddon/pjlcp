@@ -50,7 +50,7 @@
 int act_eol(void *ctx) {
     PCBDEF *pcbp = ctx;
 
-    warn(0, "tailing garbage ignored\n \\%s\\", pcbp->prs.cur);
+    warn(0, "trailing garbage ignored\n \\%s\\", pcbp->prs.cur);
     return ACT_ERROR;
 } /* act_eol */
 
