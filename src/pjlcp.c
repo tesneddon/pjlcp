@@ -117,18 +117,80 @@ int main(int argc,
             switch (status) {
             case RET_SUCCESS:
                 if (pcb.flags2.send_pjl) {
+                    /*
+                    ** The dispatched command has requested transmission
+                    ** of a PJL command to the printer.
+                    */
+                    size_t buflen, recvd = 0, sent = 0;
+
                     if (pcb.sock == -1) {
                         error(ENOTCONN, "cannot send command to printer");
                     } else {
-                        debug("%s@PJL %s \\r\\n]",
-                              pcb.flags.auto_uel ? "[ESC]%%-12345X" : "",
-                              pcb.pjlbuf == 0 ? "" : pcb.pjlbuf);
-                    }
-                }
-//                    asprintf(&out, "%s@PJL %s\r\n",
-  //                           pcb.flags.auto_uel ? "\033%%X12345", "",
-    //                         pcb.pjlbuf);
+                        /*
+                        ** Build the PJL command, like so:
+                        **
+                        **   [ UEL ]@PJL [ PJLBUF ]<CR><LF>
+                        */
+                        ssize_t count;
+                        char *outbuf = 0;
 
+                        buflen = asprintf(&outbuf, "%s@PJL %s\r\n",
+                                     pcb.flags.auto_uel ? "\033%%-12345X" : "",
+                                     pcb.pjlbuf == 0 ? "" : pcb.pjlbuf);
+                        if (buflen == -1) raise(SIGSEGV);
+
+                        /*
+                        ** Transmit the entire command to the printer, in
+                        ** chunks, if necessary.
+                        */
+                        do {
+                            count = send(pcb.sock, outbuf+sent,
+                                         buflen-sent, 0);
+                            if (count < 0) {
+                                error(errno, "failed to transmit command");
+                                break;
+                            } else {
+                                sent += count;
+                            }
+                        } while (sent < buflen);
+                        free(outbuf);
+
+                        if (pcb.flags2.expect_ack) {
+                            /*
+                            ** This command expects a response from the
+                            ** printer.  So, fetch it an dump it at
+                            ** the terminal.
+                            */
+                            static char inbuf[BUFSIZ];
+
+                            do {
+                                buflen = recv(pcb.sock, inbuf,
+                                              sizeof(inbuf), 0);
+                                if (buflen < 0) {
+                                    error(errno, "error receiving response");
+                                } else if (buflen == 0) {
+                                    error(0, "remote node closed connection");
+                                    act_disconnect(&pcb);
+                                } else {
+                                    recvd += buflen;
+
+                                    printf("%-*.*s", buflen, buflen, inbuf);
+
+                                    if (memchr(inbuf, buflen, '\f') != 0)
+                                        break;
+                                }
+                            } while (buflen > 0);
+                        }
+                    }
+
+                    if (pcb.flags.summary) {
+                        info(0, "Sent %d byte(s); Received %d byte(s)",
+                             sent, recvd);
+                    }
+
+                    pcb.rcnt += recvd;
+                    pcb.wcnt += sent;
+                }
                 break;
 
             case RET_EOF:
@@ -156,7 +218,7 @@ int main(int argc,
                 free(pcb.pjlbuf);
                 pcb.pjlbuf = 0;
             }
-            pcb.flags2.send_pjl = 0;
+            pcb.flags2.send_pjl = pcb.flags2.expect_ack = 0;
             if (pcb.flags2.exit) status = RET_QUIT;
         } while (status != RET_QUIT);
     }
