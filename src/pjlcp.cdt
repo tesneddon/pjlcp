@@ -31,8 +31,8 @@
 !                                     defintiion, but it will also stop cpp
 !                                     from whinging about unterminated strings.
 !       20-MAY-2014 V1.2    Sneddon   Modify SHOW CONNECTION. Add SET DUMP.
-!       21-MAY-2014 V1.3    Sneddon   Add FSMKDIR, FSQUERY, OPMSG, RDYMSG,
-!                                     STMSG.
+!       21-MAY-2014 V1.3    Sneddon   Add FSDELETE, FSMKDIR, FSQUERY, OPMSG,
+!                                     RDYMSG, STMSG.
 !--
 #include "keywords.h"
 #include "operators.h"
@@ -50,6 +50,7 @@ PROMPT "pjlcp> "
     WORD ECHO MIN 3 CALL act_echo:OP_INIT GOTO echo
     WORD ENTER MIN 3 CALL act_enter:OP_INIT GOTO enter
     WORD EXIT MIN 3 CALL act_exit GOTO eol
+    WORD FSDELETE MIN 4 CALL act_fsdelete:OP_INIT GOTO fsdelete
     WORD FSDIRLIST MIN 4 CALL act_fsdirlist:OP_INIT GOTO fsdirlist
     WORD FSMKDIR MIN 4 CALL act_fsmkdir:OP_INIT GOTO fsmkdir
     WORD FSQUERY MIN 4 CALL act_fsquery:OP_INIT GOTO fsquery
@@ -126,6 +127,22 @@ ELEMENT *
 
 
 !=============================================================================
+! FSDELETE NAME [ = ] "pathname"
+!
+ELEMENT fsdelete
+    WORD NAME MIN 2 NEXT
+ELEMENT *
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    GOSUB parse_string CALL act_fsdelete:OP_STORE:KW_NAME NEXT
+ELEMENT *
+    FORCE CALL act_fsdelete:OP_FINISH GOTO eol
+!
+!=============================================================================
+
+
+!=============================================================================
 ! FSDIRLIST NAME [ = ] "..." [ ENTRY [ = ] n ] [ COUNT [ = ]n ]
 !
 ELEMENT fsdirlist
@@ -156,7 +173,7 @@ ELEMENT *
 
 
 !=============================================================================
-! FSMKDIR NAME [ = ] "pathanme"
+! FSMKDIR NAME [ = ] "pathname"
 !
 ELEMENT fsmkdir
     WORD NAME MIN 2 NEXT
@@ -172,7 +189,7 @@ ELEMENT *
 
 
 !=============================================================================
-! FSQUERY NAME [ = ] "pathanme"
+! FSQUERY NAME [ = ] "pathname"
 !
 ELEMENT fsquery
     WORD NAME MIN 2 NEXT
