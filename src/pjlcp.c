@@ -175,7 +175,7 @@ int main(int argc,
                                     recvd += buflen;
 
                                     printf("%-*.*s", buflen, buflen, inbuf);
-if (pcb.flags.dump) dump(0, buf, buflen);
+if (pcb.flags.dump) dump(0, inbuf, buflen);
                                     if (memchr(inbuf, buflen, '\f') != 0)
                                         break;
                                 }

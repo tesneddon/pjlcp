@@ -121,6 +121,7 @@ void dump(FILE *file,
             char c = buf[j];
 
             fprintf(out, "%02x", c);
+            if ((j + 1) < buflen) fputc(' ', out);
         }
 
         fputs("]\n", out);
