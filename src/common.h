@@ -56,6 +56,7 @@
         struct {                    /* Internal flags                       */
             unsigned exit : 1;      /* Leave gracefully                     */
             unsigned send_pjl : 1;  /* Transmit contents of pjlbuf          */
+            unsigned expect_ack : 1;/* Response expected from printer       */
         } flags2;
     } PCBDEF;
 
