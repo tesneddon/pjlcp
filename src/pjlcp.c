@@ -173,18 +173,20 @@ int main(int argc,
                                     act_disconnect(&pcb);
                                 } else {
                                     int i;
-                                    char *ff;
 
                                     if (pcb.flags.dump)
                                         dump(0, inbuf, buflen);
                                     recvd += buflen;
 
-                                    ff = memchr(inbuf, buflen, '\f');
-                                    for (i = 0; i < (buflen - 1); i++) {
-                                        fputc(inbuf[i], stdout);
+                                    for (i = 0; i < buflen; i++) {
+                                        char c = inbuf[i];
+
+                                        if (c == '\f') {
+                                            buflen = 0;
+                                            break;
+                                        }
+                                        fputc(c, stdout);
                                     }
-                                    if (ff != 0) break;
-                                    fputc(inbuf[i], stdout);
                                 }
                             } while (buflen > 0);
                         }
