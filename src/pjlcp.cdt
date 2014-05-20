@@ -33,6 +33,7 @@
 !       20-MAY-2014 V1.2    Sneddon   Modify SHOW CONNECTION. Add SET DUMP.
 !       21-MAY-2014 V1.3    Sneddon   Add FSDELETE, FSMKDIR, FSUPLOAD, FSQUERY,
 !                                     OPMSG, RDYMSG, STMSG.
+!       22-MAY-2014 V1.4    Sneddon   Add FSCHDIR, FSPWD.
 !--
 #include "keywords.h"
 #include "operators.h"
@@ -50,9 +51,11 @@ PROMPT "pjlcp> "
     WORD ECHO MIN 3 CALL act_echo:OP_INIT GOTO echo
     WORD ENTER MIN 3 CALL act_enter:OP_INIT GOTO enter
     WORD EXIT MIN 3 CALL act_exit GOTO eol
+    WORD FSCHDIR MIN 4 CALL act_fschdir:OP_INIT GOTO fschdir
     WORD FSDELETE MIN 4 CALL act_fsdelete:OP_INIT GOTO fsdelete
     WORD FSDIRLIST MIN 4 CALL act_fsdirlist:OP_INIT GOTO fsdirlist
     WORD FSMKDIR MIN 4 CALL act_fsmkdir:OP_INIT GOTO fsmkdir
+    WORD FSPWD MIN 4 CALL act_fspwd:OP_FINISH GOTO eol
     WORD FSQUERY MIN 4 CALL act_fsquery:OP_INIT GOTO fsquery
     WORD FSUPLOAD MIN 4 CALL act_fsupload:OP_INIT GOTO fsupload
     WORD HELP MIN 3 GOTO help    
@@ -122,7 +125,23 @@ ELEMENT *
     FORCE NEXT
 ELEMENT *
     STRING ad MIN 1 CALL act_enter:OP_STORE:KW_LANGUAGE GOTO eol
+!
+!=============================================================================
 
+
+!=============================================================================
+! FSCHDIR [ NAME [ = ] "pathname" ]
+!
+ELEMENT fschdir
+    WORD NAME MIN 2 NEXT
+    FORCE CALL act_fschdir:OP_FINISH GOTO eol
+ELEMENT *
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    GOSUB parse_string CALL act_fschdir:OP_STORE:KW_NAME NEXT
+ELEMENT *
+    FORCE CALL act_fschdir:OP_FINISH GOTO eol
 !
 !=============================================================================
 
