@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "common.h"
+#define LINEMAX 16
 
 /*
 ** Forward declarations
@@ -91,19 +92,9 @@ void dump(FILE *file,
     if (buflen == 0) return;
     out = file == 0 ? stdout : file;
 
-
-#if 0
->Record 3   (59 bytes)
-  [This is coming t]-    0-[54 68 69 73 20 69 73 20 63 6F 6D 69 6E 67 20 74]
-  [o you from the e]-   16-[6F 20 79 6F 75 20 66 72 6F 6D 20 74 68 65 20 65]
-  [mailing symbiant]-   32-[6D 61 69 6C 69 6E 67 20 73 79 6D 62 69 61 6E 74]
-  [ on SKI....     ]-   48-[20 6F 6E 20 53 4B 49 2E 2E 2E 2E]
-
-#endif
-
     fprintf(out, ">Record    (%d bytes)\n", buflen);
-    for (i = 0; i < buflen; i += j) {
-        int jmax = i + 16;
+    for (i = 0; i < buflen; i += LINEMAX) {
+        int jmax = i + LINEMAX;
 
         fputs("  [", out);
 
@@ -119,12 +110,11 @@ void dump(FILE *file,
 
         fprintf(out, "]-%5d-[", i);
 
-        for (j = i; (j < jmax) && (j < buflen); j++) {
-            char c = buf[j];
-
-            fprintf(out, "%02X", c);
-            if ((j + 1) < jmax) fputc(' ', out);
-        }
+        j = i;
+        do {
+            if ((j % 16) != 0) fputc(' ', out);
+            fprintf(out, "%02X", buf[j++]);
+        } while ((j < jmax) && (j < buflen));
 
         fputs("]\n", out);
     }
