@@ -56,11 +56,13 @@
 **--
 */
 int act_display(void *ctx) {
+    static int keyword;
     PCBDEF *pcbp = ctx;
     int len, status = ACT_SUCCESS;
 
     switch (pcbp->prs.av1) {
     case OP_INIT:
+        keyword = pcbp->prs.av2;
         pcbp->pjlbuf = strdup(keywords[pcbp->prs.av2]);
         if (pcbp->pjlbuf == 0) raise(SIGSEGV);
         break;
@@ -72,7 +74,10 @@ int act_display(void *ctx) {
         break;
 
     case OP_FINISH:
-        pcbp->flags2.send_pjl = pcbp->flags2.expect_ack = 1;
+        pcbp->flags2.send_pjl = 1;
+        if (keyword == KW_STMSG) {
+            pcbp->flags2.expect_ack = 1;
+        }
         break;
 
     default:
