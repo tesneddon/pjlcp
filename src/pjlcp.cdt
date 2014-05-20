@@ -31,6 +31,7 @@
 !                                     defintiion, but it will also stop cpp
 !                                     from whinging about unterminated strings.
 !       20-MAY-2014 V1.2    Sneddon   Modify SHOW CONNECTION. Add SET DUMP.
+!       21-MAY-2014 V1.3    Sneddon   Add OPMSG, RDYMSG, STMSG.
 !--
 #include "keywords.h"
 #include "operators.h"
@@ -52,13 +53,16 @@ PROMPT "pjlcp> "
     WORD HELP MIN 3 GOTO help    
     WORD INFO MIN 3 CALL act_info:OP_INIT GOTO info
     WORD INQUIRE MIN 3 GOTO inquire
+    WORD OPMSG MIN 3 CALL act_display:OP_INIT:KW_OPMSG GOTO display
     WORD PJL MIN 3 CALL act_pjl:OP_FINISH GOTO eol
     WORD PLEASE CALL act_please:OP_INIT:0 GOTO please
     WORD PLS CALL act_please:OP_INIT:1 GOTO please
     WORD PLZ CALL act_please:OP_INIT:2 GOTO please
     WORD QUIT MIN 3 CALL act_exit GOTO eol
+    WORD RDYMSG MIN 3 CALL act_display:OP_INIT:KW_RDYMSG GOTO display
     WORD SET MIN 3 GOTO set
     WORD SHOW MIN 2 GOTO show
+    WORD STMSG MIN 3 CALL act_display:OP_INIT:KW_STMSG GOTO display
 
 
 !=============================================================================
@@ -217,7 +221,24 @@ ELEMENT please
     FORCE NEXT
 ELEMENT *
     FORCE GOTO START
+!
+!=============================================================================
 
+
+!=============================================================================
+! OPMSG | RDYMSG | STMSG [ DISPLAY [ = ] ] "message"
+!
+ELEMENT display
+    WORD DISPLAY MIN 3 NEXT
+    FORCE GOTO message
+ELEMENT *
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT message
+    GOSUB parse_string CALL act_display:OP_STORE:KW_DISPLAY NEXT
+ELEMENT *
+    FORCE CALL act_display:OP_FINISH GOTO eol
+    
 !
 !=============================================================================
 
