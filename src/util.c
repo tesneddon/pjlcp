@@ -28,15 +28,17 @@
 **
 **      08-MAY-2014 V1.0    Sneddon   Initial coding.
 **      09-MAY-2014 V1.1    Sneddon   Fixed spacing in cat.
+**      20-MAY-2014 V1.2    Sneddon   Add dump.
 **--
 */
 #define MODULE PJLCP_UTIL
-#define IDENT "V1.1"
+#define IDENT "V1.2"
 #ifdef __VMS
 # pragma module MODULE IDENT
 #endif
 #include <signal.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include "common.h"
 
@@ -45,6 +47,7 @@
 */
 
     char *cat(char *old, char *format, ...);
+    void dump(FILE *file, const char *buf, const size_t buflen);
 
 char *cat(char *old,
           char *format,
@@ -76,4 +79,52 @@ char *cat(char *old,
     free(buf);
 
     return result;
-}
+} /* cat */
+
+
+void dump(FILE *file,
+          const char *buf,
+          const size_t buflen) {
+    FILE *out;
+    int i, j;
+
+    if (buflen == 0) return;
+    out = file == 0 ? stdout : file;
+
+
+#if 0
+>Record 3   (59 bytes)
+  [This is coming t]-    0-[54 68 69 73 20 69 73 20 63 6F 6D 69 6E 67 20 74]
+  [o you from the e]-   16-[6F 20 79 6F 75 20 66 72 6F 6D 20 74 68 65 20 65]
+  [mailing symbiant]-   32-[6D 61 69 6C 69 6E 67 20 73 79 6D 62 69 61 6E 74]
+  [ on SKI....     ]-   48-[20 6F 6E 20 53 4B 49 2E 2E 2E 2E]
+
+#endif
+
+    fprintf(out, ">Record    (%d bytes)\n", buflen);
+    for (i = 0; i < buflen; i += j) {
+        fputs("  [", out);
+
+        for (j = i; j < (i + 16); j++) {
+            char c = buf[j];
+
+            if (j >= buflen) {
+                fputc(' ', out);
+            } else {
+                fputc(isprint(c) ? c : '.', out);
+            }
+        }
+
+        fprintf(out, "]-%5d-[", i);
+
+        for (j = i; (j < buflen) && (j < (i + 16)); j++) {
+            char c = buf[j];
+
+            fprintf(out, "%02x", c);
+        }
+
+        fputs("]\n", out);
+    }
+
+} /* dump */
+

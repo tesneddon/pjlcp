@@ -59,6 +59,8 @@ int act_set(void *ctx) {
         case 3 /* NOSUMMARY  */: pcbp->flags.summary = 0; break;
         case 4 /*   TIMEOUT=n*/: pcbp->timeout = pcbp->prs.num; break;
         case 5 /* NOTIMEOUT  */: pcbp->timeout = 0; break;
+        case 6 /*   DUMP     */: pcbp->flags.dump = 1; break;
+        case 7 /* NODUMP     */: pcbp->flags.dump = 0; break;
         }
         break;
 

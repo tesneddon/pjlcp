@@ -64,9 +64,12 @@ int act_show(void *ctx) {
 Current connection:\n\
 \n\
   Host: %s Port: %d\n\
-  CPU time:              Connect time:\n\
+  CPU time:              Connect time:\n\\n\
   Bytes\n\
-    sent: %d received: %d\n", pcbp->hostname, pcbp->port, pcbp->wcnt,
+    sent: %d received: %d\n\
+  Flags\n\
+    Automatic UEL:       Summary: \n\
+    Packet Dump: \n", pcbp->hostname, pcbp->port, pcbp->wcnt,
                               pcbp->rcnt);
             }
             break;

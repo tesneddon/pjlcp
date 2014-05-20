@@ -30,7 +30,7 @@
 !                                     the same as a single in the parser
 !                                     defintiion, but it will also stop cpp
 !                                     from whinging about unterminated strings.
-!       20-MAY-2014 V1.2    Sneddon   Modify SHOW CONNECTION.
+!       20-MAY-2014 V1.2    Sneddon   Modify SHOW CONNECTION. Add SET DUMP.
 !--
 #include "keywords.h"
 #include "operators.h"
@@ -217,6 +217,8 @@ PROMPT "What? "
     WORD SUMMARY MIN 3 CALL act_set:OP_STORE:2 GOTO eol
     WORD TIMEOUT MIN 3 GOTO set_timeout
     WORD NOTIMEOUT MIN 4 CALL act_set:OP_STORE:5 GOTO eol
+    WORD DUMP MIN 3 CALL act_set:OP_STORE:6 GOTO eol
+    WORD NODUMP MIN 4 CALL act_set:OP_STORE:7 GOTO eol
 
 ELEMENT set_timeout
     CHAR = NEXT

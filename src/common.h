@@ -22,11 +22,13 @@
 **  08-MAY-2014  Sneddon    Added cat() macro for building PJL commands.
 **                          Remove actions routines (this is auto-gen'd).
 **  16-MAY-2014  Sneddon    Add timeout.
+**  20-MAY-2014  Sneddon    Add dump routine and flag.
 */
 #ifndef PJLCP_COMMON_H_
 #define PJLCP_COMMON_H_
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <stdio.h>
 #include <sys/socket.h>
 #include <prsdef.h>
 #define PRS_KEYWORDS_EXTERN
@@ -51,6 +53,7 @@
         int timeout;                /* TCP/IP inactivity timeout.           */
         struct {                    /* User configurable options.           */
             unsigned auto_uel : 1;  /* Automatically prefix UEL             */
+            unsigned dump : 1;      /* Control packet dump                  */
             unsigned summary : 1;   /* Report network traffic counts        */
         } flags;
         struct {                    /* Internal flags                       */
@@ -86,5 +89,6 @@
 */
 
     char *cat(char *old, char *format, ...);
+    void dump(FILE *stream, const char *packet, const size_t len);
 
 #endif /* PJLCP_COMMON_H_ */
