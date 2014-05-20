@@ -29,10 +29,11 @@
 **  MODIFICATION HISTORY:
 **
 **      01-MAY-2014 V1.0    Sneddon     Initial coding.
+**      21-MAY-2014 V1.1    Sneddon     Fix range limits of NAME value.
 **--
 */
 #define MODULE PJLCP_FS
-#define IDENT "V1.0"
+#define IDENT "V1.1"
 #ifdef __VMS
 # pragma module MODULE IDENT
 #endif
@@ -70,10 +71,14 @@ int act_fsdirlist(void *ctx) {
 
     case OP_STORE:
         switch (pcbp->prs.av2) {
-        case KW_NAME:
+        case KW_NAME: {
+            const int len = pcbp->prs.end - pcbp->prs.cur;
+
             name = 1;
-            pcbp->pjlbuf = cat(pcbp->pjlbuf, "NAME=%s", pcbp->prs.cur);
+            pcbp->pjlbuf = cat(pcbp->pjlbuf, "NAME=%-*.*s",
+                               len, len, pcbp->prs.cur);
             break;
+        }
 
         case KW_ENTRY:
             entry = 1;
