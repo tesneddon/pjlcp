@@ -135,8 +135,8 @@ int main(int argc,
                         char *outbuf = 0;
 
                         buflen = asprintf(&outbuf, "%s@PJL %s\r\n",
-                                     pcb.flags.auto_uel ? "\033%%-12345X" : "",
-                                     pcb.pjlbuf == 0 ? "" : pcb.pjlbuf);
+                                    pcb.flags.auto_uel ? "\033%%-12345X" : "",
+                                    pcb.pjlbuf == 0 ? "" : pcb.pjlbuf);
                         if (buflen == -1) raise(SIGSEGV);
 
                         /*
@@ -172,12 +172,19 @@ int main(int argc,
                                     error(0, "remote node closed connection");
                                     act_disconnect(&pcb);
                                 } else {
+                                    int i;
+                                    char *ff;
+
+                                    if (pcb.flags.dump)
+                                        dump(0, inbuf, buflen);
                                     recvd += buflen;
 
-                                    printf("%-*.*s", buflen, buflen, inbuf);
-if (pcb.flags.dump) dump(0, inbuf, buflen);
-                                    if (memchr(inbuf, buflen, '\f') != 0)
-                                        break;
+                                    ff = memchr(inbuf, buflen, '\f');
+                                    for (i = 0; i < (buflen - 1); i++) {
+                                        fputc(inbuf[i], stdout);
+                                    }
+                                    if (ff != 0) break;
+                                    fputc(inbuf[i], stdout);
                                 }
                             } while (buflen > 0);
                         }
