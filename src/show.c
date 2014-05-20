@@ -64,13 +64,19 @@ int act_show(void *ctx) {
 Current connection:\n\
 \n\
   Host: %s Port: %d\n\
-  CPU time:              Connect time:\n\\n\
+  CPU time:                  Connect time:\n\
   Bytes\n\
     sent: %d received: %d\n\
   Flags\n\
-    Automatic UEL:       Summary: \n\
-    Packet Dump: \n", pcbp->hostname, pcbp->port, pcbp->wcnt,
-                              pcbp->rcnt);
+    Automatic UEL:       %-3s  Summary:           %-3s\n\
+    Packet Dump:         %-3s\n",
+                pcbp->sock != -1 ? pcbp->hostname : "",
+                pcbp->sock != -1 ? pcbp->port : 0,
+                pcbp->wcnt,
+                pcbp->rcnt,
+                pcbp->flags.auto_uel    ? "on" : "off",
+                pcbp->flags.summary     ? "on" : "off",
+                pcbp->flags.dump        ? "on" : "off");
             }
             break;
 

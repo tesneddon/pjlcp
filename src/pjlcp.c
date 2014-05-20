@@ -214,7 +214,7 @@ int main(int argc,
 
             case RET_ERROR:
             default:
-                printf("error...\n");
+                // syntax error is in here...how to tell the difference?
                 break;
             }
 

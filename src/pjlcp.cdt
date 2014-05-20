@@ -36,7 +36,7 @@
 #include "operators.h"
 #define QUOTE ""
 
-ELEMENT * -
+ELEMENT START -
 PROMPT "pjlcp> "
     CHAR e SUCCESS
     CHAR ! SUCCESS
@@ -53,6 +53,9 @@ PROMPT "pjlcp> "
     WORD INFO MIN 3 CALL act_info:OP_INIT GOTO info
     WORD INQUIRE MIN 3 GOTO inquire
     WORD PJL MIN 3 CALL act_pjl:OP_FINISH GOTO eol
+    WORD PLEASE CALL act_please:OP_INIT:0 GOTO please
+    WORD PLS CALL act_please:OP_INIT:1 GOTO please
+    WORD PLZ CALL act_please:OP_INIT:2 GOTO please
     WORD QUIT MIN 3 CALL act_exit GOTO eol
     WORD SET MIN 3 GOTO set
     WORD SHOW MIN 2 GOTO show
@@ -202,6 +205,19 @@ ELEMENT inquire_var
     STRING ad MIN 1 NEXT
 ELEMENT *
     FORCE GOTO eol
+!
+!=============================================================================
+
+
+!=============================================================================
+! PLEASE HIDE 
+
+ELEMENT please
+    WORD HIDE CALL act_please:OP_FINISH:0 GOTO eol
+    FORCE NEXT
+ELEMENT *
+    FORCE GOTO START
+
 !
 !=============================================================================
 
