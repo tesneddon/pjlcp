@@ -125,6 +125,14 @@ int main(int argc,
 
                     if (pcb.sock == -1) {
                         error(ENOTCONN, "cannot send command to printer");
+                    } else if (pcb.flags2.pseudo) {
+                        /*
+                        ** Pseudo commands are meant to look and behave like
+                        ** PJL commands.  However, they do not end up at the
+                        ** printer.  Instead, pjlbuf contains the response
+                        ** to be written to the user.
+                        */
+                        fprintf(stdout, "@PJL %s\n", pcb.pjlbuf);
                     } else {
                         /*
                         ** Build the PJL command, like so:
@@ -214,6 +222,7 @@ int main(int argc,
 
             case RET_ERROR:
             default:
+                printf("syntax error\n");
                 // syntax error is in here...how to tell the difference?
                 break;
             }
@@ -228,6 +237,7 @@ int main(int argc,
                 pcb.pjlbuf = 0;
             }
             pcb.flags2.send_pjl = pcb.flags2.expect_ack = 0;
+            pcb.flags2.pseudo = 0;
             if (pcb.flags2.exit) status = RET_QUIT;
         } while (status != RET_QUIT);
     }

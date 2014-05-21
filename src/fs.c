@@ -31,6 +31,7 @@
 **      01-MAY-2014 V1.0    Sneddon     Initial coding.
 **      21-MAY-2014 V1.1    Sneddon     Fix range limits of NAME value.
 **                                      Add FSDELETE, FSMKDIR, FSQUERY.
+**      21-MAY-2014 V1.2    Sneddon     Add FSPWD.
 **--
 */
 #define MODULE PJLCP_FS
@@ -49,11 +50,20 @@
 ** Forward declarations
 */
 
+    int act_fschdir(void *ctx);
     int act_fsdelete(void *ctx);
     int act_fsdirlist(void *ctx);
     int act_fsmkdir(void *ctx);
+    int act_fspwd(void *ctx);
     int act_fsquery(void *ctx);
     int act_upload(void *ctx);
+
+int act_fschdir(void *ctx) {
+    PCBDEF *pcbp = ctx;
+    int status = ACT_SUCCESS;
+
+    return ACT_ERROR;
+} /* act_fschdir */
 
 int act_fsdelete(void *ctx) {
     PCBDEF *pcbp = ctx;
@@ -230,6 +240,25 @@ int act_fsmkdir(void *ctx) {
 
     return status;
 } /* act_fsmkdir */
+
+int act_fspwd(void *ctx) {
+    PCBDEF *pcbp = ctx;
+    int status = ACT_SUCCESS;
+
+    switch (pcbp->prs.av1) {
+    case OP_FINISH:
+        pcbp->flags2.send_pjl = pcbp->flags2.pseudo = 1;
+        pcbp->pjlbuf = cat(0, "FSPWD NAME=\"%s\" TYPE=DIR", pcbp->fspath);
+        break;
+
+    default:
+        error(EPERM, "operation not supported by this command");
+        status = ACT_ERROR;
+        break;
+    }
+
+    return status;
+} /* act_fspwd */
 
 int act_fsquery(void *ctx) {
     PCBDEF *pcbp = ctx;

@@ -33,7 +33,7 @@
 !       20-MAY-2014 V1.2    Sneddon   Modify SHOW CONNECTION. Add SET DUMP.
 !       21-MAY-2014 V1.3    Sneddon   Add FSDELETE, FSMKDIR, FSUPLOAD, FSQUERY,
 !                                     OPMSG, RDYMSG, STMSG.
-!       22-MAY-2014 V1.4    Sneddon   Add FSCHDIR, FSPWD.
+!       21-MAY-2014 V1.4    Sneddon   Add FSCHDIR, FSPWD.
 !--
 #include "keywords.h"
 #include "operators.h"

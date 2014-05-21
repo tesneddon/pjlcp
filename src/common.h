@@ -45,6 +45,7 @@
     typedef struct _pcb {
         struct prs prs;             /* PRS Control Block -- must be first   */
         char *pjlbuf;               /* PJL command buffer                   */
+        char *fspath;
         char *hostname;             /* Hostname of current connection       */
         unsigned short port;        /* Post number (host order)             */
         struct sockaddr_in addr;    /* Socket address                       */
@@ -60,6 +61,7 @@
             unsigned exit : 1;      /* Leave gracefully                     */
             unsigned send_pjl : 1;  /* Transmit contents of pjlbuf          */
             unsigned expect_ack : 1;/* Response expected from printer       */
+            unsigned pseudo : 1;    /* Executing a Pseudo PJl command       */
         } flags2;
     } PCBDEF;
 

@@ -70,6 +70,8 @@ int act_connect(void *ctx) {
             pcbp->rcnt = pcbp->wcnt = 0;
             pcbp->hostname = 0;
             pcbp->port = DEFAULT_PORT;
+            pcbp->fspath = strdup("0:\\");
+            if (pcbp->fspath == 0) raise(SIGSEGV);
         }
         break;
 
@@ -85,7 +87,7 @@ int act_connect(void *ctx) {
             pcbp->port = pcbp->prs.num;
             break;
 
-        case 2: {       /* Store named port number */\
+        case 2: {       /* Store named port number */
             struct servent *entry;
             char *name;
 
@@ -186,6 +188,7 @@ int act_disconnect(void *ctx) {
     close(pcbp->sock);
     pcbp->sock = -1;
     free(pcbp->hostname);
+    free(pcbp->fspath);
 
     return ACT_SUCCESS;
 } /* act_disconnect */
