@@ -207,18 +207,20 @@ ELEMENT *
 
 !=============================================================================
 ! FSUPLOAD NAME [ = ] "pathname" [ OFFSET [ = ] n ] [ SIZE [ = ] n ]
+!           [ OUTPUT [ = ] "local-pathname"
 !
 ELEMENT fsupload
     WORD NAME MIN 2 CALL act_fsupload:OP_CHECK:KW_NAME GOTO fsupload_name
     WORD OFFSET MIN 2 CALL act_fsupload:OP_CHECK:KW_OFFSET GOTO fsupload_offset
     WORD SIZE MIN 2 CALL act_fsupload:OP_CHECK:KW_SIZE GOTO fsupload_size
+    WORD OUTPUT MIN 3 CALL act_fsupload:OP_CHECK:KW_OUTPUT GOTO fsupload_output
     FORCE CALL act_fsupload:OP_FINISH GOTO eol
 
 ELEMENT fsupload_name
     CHAR = NEXT
     FORCE NEXT
 ELEMENT *
-    GOSUB parse_string CALL act_fsupload:OP_STORE:KW_NAME GOTO fsdirlist
+    GOSUB parse_string CALL act_fsupload:OP_STORE:KW_NAME GOTO fsupload
 
 ELEMENT fsupload_offset
     CHAR = NEXT
@@ -231,6 +233,12 @@ ELEMENT fsupload_size
     FORCE NEXT
 ELEMENT *
     DECIMAL MIN 1 CALL act_fsupload:OP_STORE:KW_SIZE GOTO fsupload
+
+ELEMENT fsupload_output
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    GOSUB parse_string CALL act_fsupload:OP_STORE:KW_OUTPUT GOTO fsupload
 !
 !=============================================================================
 

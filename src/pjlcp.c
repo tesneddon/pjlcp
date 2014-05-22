@@ -227,6 +227,10 @@ int main(int argc,
                 free(pcb.pjlbuf);
                 pcb.pjlbuf = 0;
             }
+            if (pcb.output != 0) {
+                free(pcb.output);
+                pcb.output = 0;
+            }
             pcb.flags2.send_pjl = pcb.flags2.expect_ack = 0;
             if (pcb.flags2.exit) status = RET_QUIT;
         } while (status != RET_QUIT);

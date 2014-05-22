@@ -31,10 +31,11 @@
 **      01-MAY-2014 V1.0    Sneddon     Initial coding.
 **      21-MAY-2014 V1.1    Sneddon     Fix range limits of NAME value.
 **                                      Add FSDELETE, FSMKDIR, FSQUERY.
+**      22-MAY-2014 V1.2    Sneddon     Add OUTPUT to FSUPLOAD command.
 **--
 */
 #define MODULE PJLCP_FS
-#define IDENT "V1.1"
+#define IDENT "V1.2"
 #ifdef __VMS
 # pragma module MODULE IDENT
 #endif
@@ -272,13 +273,13 @@ int act_fsquery(void *ctx) {
 } /* act_fsquery */
 
 int act_fsupload(void *ctx) {
-    static int offset, size, name;
+    static int offset, size, name, output;
     PCBDEF *pcbp = ctx;
     int status = ACT_SUCCESS;
 
     switch (pcbp->prs.av1) {
     case OP_INIT:
-        name = offset = size = 0;
+        name = offset = size = output = 0;
         pcbp->pjlbuf = strdup("FSUPLOAD");
         if (pcbp->pjlbuf == 0) raise(SIGSEGV);
 
@@ -303,6 +304,13 @@ int act_fsupload(void *ctx) {
         case KW_SIZE:
             size = 1;
             pcbp->pjlbuf = cat(pcbp->pjlbuf, "SIZE=%d", pcbp->prs.num);
+            break;
+
+        case KW_OUTPUT:
+            output = 1;
+            pcbp->output = strndup(pcbp->prs.cur,
+                                   pcbp->prs.end - pcbp->prs.cur);
+            if (pcbp->output == 0) raise(SIGSEGV);
             break;
         }
 
@@ -329,6 +337,13 @@ int act_fsupload(void *ctx) {
         case KW_SIZE:
             if (size) {
                 field = "SIZE";
+                status = ACT_ERROR;
+            }
+            break;
+
+        case KW_OUTPUT:
+            if (size) {
+                field = "OUTPUT";
                 status = ACT_ERROR;
             }
             break;

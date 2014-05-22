@@ -23,6 +23,7 @@
 **                          Remove actions routines (this is auto-gen'd).
 **  16-MAY-2014  Sneddon    Add timeout.
 **  20-MAY-2014  Sneddon    Add dump routine and flag.
+**  22-MAY-2014  Sneddon    Add output.
 */
 #ifndef PJLCP_COMMON_H_
 #define PJLCP_COMMON_H_
@@ -51,6 +52,7 @@
         int sock;                   /* Active connection socket (-1 if not) */
         unsigned int wcnt, rcnt;    /* Read/write byte count                */
         int timeout;                /* TCP/IP inactivity timeout.           */
+        char *output;               /* File to write output to.             */
         struct {                    /* User configurable options.           */
             unsigned auto_uel : 1;  /* Automatically prefix UEL             */
             unsigned dump : 1;      /* Control packet dump                  */
