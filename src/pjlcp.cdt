@@ -33,6 +33,7 @@
 !       20-MAY-2014 V1.2    Sneddon   Modify SHOW CONNECTION. Add SET DUMP.
 !       21-MAY-2014 V1.3    Sneddon   Add FSDELETE, FSMKDIR, FSUPLOAD, FSQUERY,
 !                                     OPMSG, RDYMSG, STMSG.
+!       21-MAY-2014 V1.3    Sneddon   Add OUTPUT to FSUPLOAD. Add FSDOWNLOAD.
 !--
 #include "keywords.h"
 #include "operators.h"
@@ -52,6 +53,7 @@ PROMPT "pjlcp> "
     WORD EXIT MIN 3 CALL act_exit GOTO eol
     WORD FSDELETE MIN 4 CALL act_fsdelete:OP_INIT GOTO fsdelete
     WORD FSDIRLIST MIN 4 CALL act_fsdirlist:OP_INIT GOTO fsdirlist
+    WORD FSDOWNLOAD MIN 4 CALL act_fsdown:OP_INIT GOTO fsdown
     WORD FSMKDIR MIN 4 CALL act_fsmkdir:OP_INIT GOTO fsmkdir
     WORD FSQUERY MIN 4 CALL act_fsquery:OP_INIT GOTO fsquery
     WORD FSUPLOAD MIN 4 CALL act_fsupload:OP_INIT GOTO fsupload
@@ -169,6 +171,44 @@ ELEMENT fsdirlist_count
     FORCE NEXT
 ELEMENT *
     DECIMAL MIN 1 CALL act_fsdirlist:OP_STORE:KW_COUNT GOTO fsdirlist
+!
+!=============================================================================
+
+
+!=============================================================================
+! FSDOWNLOAD [ FORMAT:BINARY ] NAME [ = ] "pathname" [ SIZE [ = ] n ]
+!               [ INPUT [ = ] "local-pathname"
+!
+ELEMENT fsdown
+    WORD FORMAT NEXT
+    FORCE GOTO fsdown_attr
+ELEMENT *
+    CHAR : NEXT
+ELEMENT *
+    WORD BINARY NEXT
+ELEMENT fsdown_attr
+    WORD NAME MIN 2 CALL act_fsdown:OP_CHECK:KW_NAME GOTO fsdown_name
+    WORD SIZE MIN 2 CALL act_fsdown:OP_CHECK:KW_SIZE GOTO fsdown_size
+    WORD INPUT MIN 3 CALL act_fsdown:OP_CHECK:KW_OUTPUT GOTO fsdown_input
+    FORCE CALL act_fsdown:OP_FINISH GOTO eol
+
+ELEMENT fsdown_name
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    GOSUB parse_string CALL act_fsdown:OP_STORE:KW_NAME GOTO fsdown_attr
+
+ELEMENT fsdown_size
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    DECIMAL MIN 1 CALL act_fsdown:OP_STORE:KW_SIZE GOTO fsdown_attr
+
+ELEMENT fsdown_input
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    GOSUB parse_string CALL act_fsdown:OP_STORE:KW_INPUT GOTO fsdown_attr
 !
 !=============================================================================
 
