@@ -1,0 +1,95 @@
+!++
+!   MODULE DESCRIPTION:
+!
+!       This module parses PJL responses from the printer to extract
+!   all the useful bits that we want.
+!
+!   AUTHOR:         Tim E. Sneddon
+!
+!   Copyright (c) 2014, Endless Software Solutions.
+!
+!   All rights reserved.
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License.
+!
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!   You should have received a copy of the GNU General Public License
+!   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+!
+!   CREATION DATE:  22-MAY-2014
+!
+!   MODIFICATION HISTORY:
+!
+!       22-MAY-2014 V1.0    Sneddon   Initial coding.
+!--
+#include "keywords.h"
+#include "operators.h"
+#define QUOTE ""
+
+ELEMENT START
+    WORD @PJL NEXT
+ELEMENT *
+    WORD FSUPLOAD GOTO fsupload
+
+!=============================================================================
+! FSUPLOAD [ FORMAT:BINARY ] NAME = "pathname" [ OFFSET=n SIZE=n ]
+!
+ELEMENT fsupload
+    WORD FORMAT NEXT
+    FORCE GOTO fsupload_attr
+ELEMENT *
+    CHAR : NEXT
+ELEMENT *
+    WORD BINARY NEXT
+ELEMENT fsupload_attr
+    WORD NAME GOTO fsupload_name
+    WORD OFFSET GOTO fsupload_offset
+    WORD SIZE GOTO fsupload_size
+    FORCE CALL act_fsupload:OP_FINISH GOTO eol
+
+ELEMENT fsupload_name
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    GOSUB parse_string GOTO fsupload
+
+ELEMENT fsupload_offset
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    DECIMAL MIN 0 GOTO fsupload
+
+ELEMENT fsupload_size
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    DECIMAL MIN 0 GOTO fsupload
+!
+!=============================================================================
+
+
+!=============================================================================
+! Eat up all whitespace until the end of the line.
+!
+ELEMENT eol
+    STRING s GOTO eol
+    CHAR e SUCCESS
+    FORCE ERROR
+
+! Parse a quoted string.
+!
+ELEMENT parse_string
+    CHAR QUOTE NEXT
+ELEMENT *
+    STRING asdp TERM/KEEP QUOTE NEXT
+ELEMENT *
+    CHAR QUOTE SUCCESS
+!
+!=============================================================================
+
