@@ -1,0 +1,11 @@
+PRS -- Table Parser
+
+This utility and supporting library is used to 
+
+Context Block
+-------------
+
+The parser context block is defined in <prsdef.h> as the structure 
+
+fd -- Specified at -1 if using the terminal and readline library.  To read from
+      another source, specify a file descriptor returned by open or fileno.
