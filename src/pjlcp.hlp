@@ -1,0 +1,262 @@
+!
+!
+!
+1 Commands
+
+ The PJL Control Program is a utility intended to make communicating
+with a printer using the Printer Job Language a somewhat enjoyable
+experience.  By allowing shortened commands and reasonable defaults
+for absent parameters and qualifiers this utility makes it easier
+for a human to communicate with the printer.
+
+ All commands are case insensetive, although in all examples the PJL
+keywords are in capital leters.  This is simply to make them stand-
+out to the reader.
+
+ The commands can be grouped into the following categories (note that
+those with an '*' are not genuine PJL commands).
+
+ Kernel:
+   COMMENT
+
+ Filesystem:
+   FSCHDIR*, FSDOWNLOAD, FSMKDIR, FSPWD*, FSUPLOAD
+
+ Network:
+   CONNECT*, DISCONNECT*
+
+ Status:
+   DINQUIRE, ECHO, INFO, INQUIRE, USTATUS
+
+1 CONNECT
+
+ Connect to a printer
+
+ Format:
+
+ CONNECT NAME = host [ PORT = tcp-port ]
+
+  Use this command to establish a connection to a printer.  This
+ command is not in the PJL language definition.
+
+2 NAME
+
+ Specify the printer to connect to.
+
+ Format:
+
+ CONNECT NAME = host
+
+  host can be a dotted-decimal IP address or domain name of a printer
+ device to connect to.  It can also be optionally quoted.  This
+ qualifier is required.
+
+2 PORT
+
+ Specify TCP/IP port to connect to.
+
+ Format:
+
+ CONNECT PORT = tcp-port
+
+  tcp-port can be a signed integer between 1 and 65535 or a textual
+ name for a port (e.g. "http" is port 80).  This qualifier is optinal
+ with the default being port 9100.
+
+1 ECHO
+
+ Echo the text to the host
+
+ Format:
+
+ ECHO [ text ]
+
+  Echo the optional text argument to the host.  In the case of an
+ absent text parameter, a blank line is returned.
+
+1 INFO
+
+ Request printer information
+
+ Format:
+
+ INFO [ category ]
+
+  Request printer information related to the specific category.  The
+ category is optional and the default is ID.
+
+2 Example
+
+  The following example demonstrates the INFO command:
+
+ pjlcp> INFO
+ @PJL INFO ID
+ "HP Color LaserJet M553"
+
+  The example returns the ID string for an HP Color Laserjet M553.
+ The following are examples of other printer ID strings:
+
+ o. Brother HL-L2350DW series:84U-H5H:Ver.1.33
+ o. Brother MFC-J5320DW:8CA-U23-001:VerJ
+ o. HP LaserJet P2055 Series
+ o. RICOH Aficio MP 2550B
+ o. SCX-4650 4x21S Series
+ o. Stars4NW_01
+
+2 ID
+
+ Display printer identification
+
+ Format:
+
+ INFO ID
+
+  Display the printer identification string.  This is typically
+ related to the hardware model of the printer, (e.g. "Laserjet 4").
+
+3 Example
+
+  The following example demonstrates the INFO ID command:
+
+ pjlcp> INFO
+ @PJL INFO ID
+ "HP Color LaserJet M553"
+
+2 CONFIG
+
+ Display printer configuration
+
+ Format:
+
+ INFO CONFIG
+
+  Display printer configuration, including avaialble paper size,
+ bins, etc.
+
+3 Example
+
+  The following example demonstrates the output of the INFO CONFIG
+ command from an HP Color LaserJet M553.
+
+ pjlcp> INFO CONFIG
+ @PJL INFO CONFIG
+ IN TRAYS [2 ENUMERATED]
+     INTRAY1
+     INTRAY2
+ DUPLEX
+ OUTPUT BINS [1 ENUMERATED]
+     BIN1
+ PAPERS [33 ENUMERATED]
+     Letter
+     Legal
+     Executive
+     Statement
+     EightPointFiveByThirteen
+     ThreeXFive
+     FourXSix
+     FiveXSeven
+     FiveXEight
+     A4
+     A5
+     A5Rotated
+     A6
+     RA4
+     JisB5
+     JisB6
+     Size10x15cm
+     Size16K195x270
+     Size16K184x260
+     SixteenK
+     JPostcard
+     JDoublePostcard
+     Envelope9
+     COM10Envelope
+     MonarchEnvelope
+     B5Envelope
+     C5Envelope
+     EnvelopeC6
+     DLEnvelope
+     Oficio216x340
+     Any
+     Custom
+     AnyCustom
+ LANGUAGES [8 ENUMERATED]
+     PCL
+     PCLXL
+     POSTSCRIPT
+     PDF
+     AirPrint
+     PWGRASTER
+     TIFF
+     BMP
+ USTATUS [4 ENUMERATED]
+     DEVICE
+     JOB
+     PAGE
+     TIMED
+ MEMORY=1024000000
+ DISPLAY LINES=4
+ DISPLAY CHARACTER SIZE=80
+ DISK 0 MODEL NUMBER="Toshiba 06G400"
+ DISK 0 SERIAL NUMBER="6494B223"
+ DISK 0 FIRMWARE REVISION=""
+ DISK 0 LOCK STATUS=Unlocked
+ SERIAL NUMBER="JPCKL85CFT"
+ FORMATTER NUMBER="ZN70TVN"
+ FIRMWARE DATECODE=2018-06-05 2308974_579763
+
+2 FILESYS
+
+ Display printer file system ifnormation
+
+ Format:
+
+ INFO FILESYS
+
+  This command returns a table of information detailing the physical
+ disk devices attached to the printer.  Not all printers have
+ filesystems.
+
+3 Example
+
+  The following example output is from an HP Color LaserJet with a
+ single disk device:
+
+ pjlcp> INFO FILESYS
+ @PJL INFO FILESYS [2 TABLE]
+     VOLUME  TOTAL SIZE  FREE SPACE  LOCATION    LABEL   STATUS
+     0:  644489216   644104192   DISK 0  ?           READ-WRITE
+
+2 MEMORY
+
+2 PAGECOUNT
+
+2 PRODINFO
+
+2 STATUS
+
+2 VARIABLES
+
+2 USTATUS
+
+1 EXIT
+
+ Exit the PJL Control Program
+
+ Format:
+
+ EXIT
+
+  This command will force pjlcp to exit, disconnecting all
+ active connections.  This command is not in the PJL language
+ definition.
+
+1 QUIT
+
+ Exit from the PJL Control Program
+
+ Format:
+
+ QUIT
+
+ See help for EXIT command for more details.
