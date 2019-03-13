@@ -150,12 +150,20 @@ int main(int argc,
                                 error(errno, "failed to transmit command");
                                 break;
                             } else {
+                                if (pcb.flags.dump)
+                                    dump(0, outbuf+sent, buflen-sent);
+
                                 sent += count;
                             }
                         } while (sent < buflen);
                         free(outbuf);
 
                         if (pcb.flags2.expect_ack) {
+
+// need a SIGIO routine that can read an dump a response
+
+// disable SIGIO
+
                             /*
                             ** This command expects a response from the
                             ** printer.  So, fetch it an dump it at
@@ -163,7 +171,11 @@ int main(int argc,
                             */
                             static char inbuf[BUFSIZ];
 
+// sigsetjmp -- to catch ^C
+
                             do {
+
+// loop, reading in buffer
                                 buflen = recv(pcb.sock, inbuf,
                                               sizeof(inbuf), 0);
                                 if (buflen < 0) {
@@ -189,6 +201,11 @@ int main(int argc,
                                     }
                                 }
                             } while (buflen > 0);
+
+// pass buffer to parse routine
+
+// restore SIGIO
+
                         }
                     }
 
@@ -214,7 +231,6 @@ int main(int argc,
 
             case RET_ERROR:
             default:
-                // syntax error is in here...how to tell the difference?
                 break;
             }
 

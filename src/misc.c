@@ -45,6 +45,9 @@
 
     int act_eol(void *ctx);
     int act_exit(void *ctx);
+    int act_ivqual(void *ctx);
+    int act_ivverb(void *ctx);
+    int act_utstr(void *ctx);
     int act_please(void *ctx);
 
 int act_eol(void *ctx) {
@@ -60,6 +63,30 @@ int act_exit(void *ctx) {
     pcbp->flags2.exit = 1;
     return ACT_SUCCESS;
 } /* act_exit */
+
+int act_ivqual(void *ctx) {
+    PCBDEF *pcbp = ctx;
+    int len = pcbp->prs.end - pcbp->prs.cur;
+
+    warn(0, "unrecognized qualifier\n \\%-*.*s\\", len, len, pcbp->prs.cur);
+    return ACT_ERROR;
+} /* act_ivqual */
+
+int act_ivverb(void *ctx) {
+    PCBDEF *pcbp = ctx;
+    int len = pcbp->prs.end - pcbp->prs.cur;
+
+    warn(0, "unrecognized command verb\n \\%-*.*s\\", len, len, pcbp->prs.cur);
+    return ACT_ERROR;
+} /* act_ivverb */
+
+int act_utstr(void *ctx) {
+    PCBDEF *pcbp = ctx;
+    int len = pcbp->prs.end - pcbp->prs.cur;
+
+    warn(0, "unterminated string");
+    return ACT_ERROR;
+} /* act_utstr */
 
 int act_please(void *ctx) {
     PCBDEF *pcbp = ctx;

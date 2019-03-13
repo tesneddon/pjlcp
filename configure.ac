@@ -16,7 +16,7 @@ dnl along with pjlcp.  If not, see <http://www.gnu.org/licenses/>.
 # Initialization...
 #
 AC_PREREQ([2.68])
-AC_INIT([pjlcp], [1.0], [pjlcp-bugs@endlesssoftware.com.au],,
+AC_INIT([pjlcp], [3.0], [pjlcp-bugs@endlesssoftware.com.au],,
          [http://endlesssoftware.com.au/pjlcp])
 
 AM_INIT_AUTOMAKE
@@ -37,6 +37,7 @@ AC_PROG_INSTALL
 AM_PROG_CC_C_O
 AC_PROG_RANLIB
 
+AX_WITH_CURSES
 AX_LIB_READLINE
 
 AC_OUTPUT

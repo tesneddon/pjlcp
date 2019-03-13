@@ -3,6 +3,9 @@
 **
 **  Version information #include file for PJLCP.
 **
+**  The version number starts at 3.0 as it is the third version of the
+**  original PJLTOOL.
+**
 **  Copyright (c) 2014, Endless Software Solutions.
 **
 **  All rights reserved.
@@ -23,8 +26,8 @@
 #define PJLCP_VERSION_H_
 #define _GNU_SOURCE
 #include <errno.h>
-#define PJLCP_VERSION          "V1.0"
-#define PJLCP_MAJOR_VERSION    "1"
+#define PJLCP_VERSION          "V3.0"
+#define PJLCP_MAJOR_VERSION    "3"
 #define PJLCP_MINOR_VERSION    "0"
 #define PJLCP_REVISION         "0"
 #define PJLCP_COPYRIGHT        \

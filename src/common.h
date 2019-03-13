@@ -24,6 +24,8 @@
 **  16-MAY-2014  Sneddon    Add timeout.
 **  20-MAY-2014  Sneddon    Add dump routine and flag.
 **  22-MAY-2014  Sneddon    Add output.
+**  29-SEP-2014  Sneddon    Add DEFAULT_PATH.  Add pwd, fsmask to connection
+**                          context.
 */
 #ifndef PJLCP_COMMON_H_
 #define PJLCP_COMMON_H_
@@ -32,10 +34,22 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <prsdef.h>
+#include "queue.h"
 #define PRS_KEYWORDS_EXTERN
 #include "keywords.h"
 #include "operators.h"
 
+#ifdef MIN
+# undef MIN
+#endif
+#define MIN(m, n) (((m) < (n)) ? (m) : (n))
+
+#ifdef MAX
+# undef MAX
+#endif
+#define MAX(m, n) (((m) > (n)) ? (m) : (n))
+
+#define DEFAULT_PATH "0:\\"
 #define DEFAULT_PORT 9100
 
 /*
@@ -47,11 +61,13 @@
         struct prs prs;             /* PRS Control Block -- must be first   */
         char *pjlbuf;               /* PJL command buffer                   */
         char *hostname;             /* Hostname of current connection       */
+        char *pwd;                  /* Default working directory            */
         unsigned short port;        /* Post number (host order)             */
         struct sockaddr_in addr;    /* Socket address                       */
         int sock;                   /* Active connection socket (-1 if not) */
         unsigned int wcnt, rcnt;    /* Read/write byte count                */
         int timeout;                /* TCP/IP inactivity timeout.           */
+        unsigned fsmask;            /* FS* coptions                         */
         char *output;               /* File to write output to.             */
         struct {                    /* User configurable options.           */
             unsigned auto_uel : 1;  /* Automatically prefix UEL             */
@@ -91,6 +107,7 @@
 */
 
     char *cat(char *old, char *format, ...);
+    char *strip(const char *str, const int len);
     void dump(FILE *stream, const char *packet, const size_t len);
 
 #endif /* PJLCP_COMMON_H_ */

@@ -49,6 +49,7 @@
 **
 **  MODIFICATION HISTORY:
 **
+**      27-Oct-2014 Sneddon     Add support for non-terminal input channel.
 **      01-May-2014 Sneddon     Tidy up.
 **
 **  Revision 1.1.7.2  1996/02/18  23:11:48  marty
@@ -127,6 +128,7 @@
         unsigned int tbu;       /* Amount of buffer actually used */
         char *cmd;              /* Pointer to command buffer */
         int cms;                /* Size of command buffer */
+        int fd;                 /* Input Channel, -1 to use terminal */
         char *cur;              /* Pointer to current element in cmd */
         char *end;              /* Pointer to next char after element */
         char *nxt;              /* Pointer to next element to check */

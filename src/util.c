@@ -40,6 +40,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "common.h"
 #define LINEMAX 16
 
@@ -48,6 +49,7 @@
 */
 
     char *cat(char *old, char *format, ...);
+    char *strip(const char *str, const int len);
     void dump(FILE *file, const char *buf, const size_t buflen);
 
 char *cat(char *old,
@@ -82,6 +84,47 @@ char *cat(char *old,
     return result;
 } /* cat */
 
+char *strip(const char *oldstr,
+            const int len) {
+
+    char *newstr;
+    int oldlen = len, i, j, quote = 0;
+
+    if (oldlen == -1)
+        oldlen = strlen(oldstr);
+
+    newstr = calloc(1, oldlen+1);
+    if (newstr != 0) {
+        /*
+        ** First, drop all trailing spaces.
+        */
+        for (; oldlen > 0; oldlen--) {
+            if (!isspace(oldstr[oldlen-1])) break;
+        }
+
+        /*
+        ** Skip all the leading space.
+        */
+        for (i = 0; i < oldlen; i++)
+            if (!isspace(oldstr[i])) break;
+
+        /*
+        ** Finally, drop unnecessary quotes.
+        */
+        for (j = 0; i < oldlen; i++) {
+            if (oldstr[i] == '"') {
+                if (!quote) {
+                    quote = 1;
+                    continue;
+                }
+            }
+            quote = 0;
+            newstr[j++] = oldstr[i];
+        }
+    }
+
+    return newstr;
+} /* strip */
 
 void dump(FILE *file,
           const char *buf,
@@ -92,7 +135,7 @@ void dump(FILE *file,
     if (buflen == 0) return;
     out = file == 0 ? stdout : file;
 
-    fprintf(out, ">Record    (%d bytes)\n", buflen);
+    fprintf(out, ">Record    (%d bytes)\n", (int) buflen);
     for (i = 0; i < buflen; i += LINEMAX) {
         int jmax = i + LINEMAX;
 
@@ -120,4 +163,5 @@ void dump(FILE *file,
     }
 
 } /* dump */
+
 

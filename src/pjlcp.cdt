@@ -34,6 +34,7 @@
 !       21-MAY-2014 V1.3    Sneddon   Add FSDELETE, FSMKDIR, FSUPLOAD, FSQUERY,
 !                                     OPMSG, RDYMSG, STMSG.
 !       21-MAY-2014 V1.3    Sneddon   Add OUTPUT to FSUPLOAD. Add FSDOWNLOAD.
+!       29-SEP-2014 V1.4    Sneddon   Add FSPWD, FSCHDIR, FSENVIRONMENT.
 !--
 #include "keywords.h"
 #include "operators.h"
@@ -51,13 +52,16 @@ PROMPT "pjlcp> "
     WORD ECHO MIN 3 CALL act_echo:OP_INIT GOTO echo
     WORD ENTER MIN 3 CALL act_enter:OP_INIT GOTO enter
     WORD EXIT MIN 3 CALL act_exit GOTO eol
+    WORD FSCHDIR MIN 3 GOTO fschdir
     WORD FSDELETE MIN 4 CALL act_fsdelete:OP_INIT GOTO fsdelete
     WORD FSDIRLIST MIN 4 CALL act_fsdirlist:OP_INIT GOTO fsdirlist
     WORD FSDOWNLOAD MIN 4 CALL act_fsdown:OP_INIT GOTO fsdown
-    WORD FSMKDIR MIN 4 CALL act_fsmkdir:OP_INIT GOTO fsmkdir
-    WORD FSQUERY MIN 4 CALL act_fsquery:OP_INIT GOTO fsquery
-    WORD FSUPLOAD MIN 4 CALL act_fsupload:OP_INIT GOTO fsupload
-    WORD HELP MIN 3 GOTO help    
+    WORD FSENVIRONMENT MIN 3 CALL act_fsenv:OP_INIT GOTO fsenv
+    WORD FSMKDIR MIN 3 CALL act_fsmkdir:OP_INIT GOTO fsmkdir
+    WORD FSPWD MIN 3 CALL act_fspwd GOTO eol
+    WORD FSQUERY MIN 3 CALL act_fsquery:OP_INIT GOTO fsquery
+    WORD FSUPLOAD MIN 3 CALL act_fsupload:OP_INIT GOTO fsupload
+    WORD HELP MIN 3 CALL act_help:OP_INIT GOTO help
     WORD INFO MIN 3 CALL act_info:OP_INIT GOTO info
     WORD INQUIRE MIN 3 GOTO inquire
     WORD OPMSG MIN 3 CALL act_display:OP_INIT:KW_OPMSG GOTO display
@@ -70,7 +74,9 @@ PROMPT "pjlcp> "
     WORD SET MIN 3 GOTO set
     WORD SHOW MIN 2 GOTO show
     WORD STMSG MIN 3 CALL act_display:OP_INIT:KW_STMSG GOTO display
-
+    FORCE NEXT
+ELEMENT *
+    STRING ad CALL act_ivverb ERROR
 
 !=============================================================================
 ! COMMENT [ remarks... ]
@@ -85,19 +91,26 @@ ELEMENT *
 
 
 !=============================================================================
-! CONNECT <hostname> [ <port> ]
+! CONNECT NAME [ = ] hostname [ PORT [ = ] port ]
 !
-ELEMENT connect -
-PROMPT "Where? "
-    STRING ad.-_ MIN 1 CALL act_connect:OP_STORE:0 NEXT
-
-ELEMENT *
-    DECIMAL CALL act_connect:OP_STORE:1 NEXT
-    STRING ad-_ MIN 1 CALL act_connect:OP_STORE:2 NEXT
-    FORCE NEXT
-
-ELEMENT *
+ELEMENT connect
+    WORD NAME MIN 2 CALL act_connect:OP_CHECK:KW_NAME GOTO connect_name
+    WORD PORT MIN 2 CALL act_connect:OP_CHECK:KW_PORT GOTO connect_port
     FORCE CALL act_connect:OP_FINISH GOTO eol
+
+ELEMENT connect_name
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    GOSUB parse_string CALL act_connect:OP_STORE:KW_NAME GOTO connect
+
+ELEMENT connect_port
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    DECIMAL MIN 1 CALL act_connect:OP_STORE:KW_PORT:0 GOTO connect
+
+!    GOSUB parse_string CALL act_connect:OP_STORE:KW_PORT:1 GOTO connect
 !
 !=============================================================================
 
@@ -119,12 +132,29 @@ ELEMENT *
 !
 ELEMENT enter
     WORD LANGUAGE MIN 3 NEXT
+    STRING ad CALL act_ivqual ERROR
 ELEMENT *
     CHAR = NEXT
     FORCE NEXT
 ELEMENT *
     STRING ad MIN 1 CALL act_enter:OP_STORE:KW_LANGUAGE GOTO eol
 
+!
+!=============================================================================
+
+
+!=============================================================================
+! FSCHDIR NAME [ = ] "pathname"
+!
+ELEMENT fschdir
+    WORD NAME MIN 2 NEXT
+ELEMENT *
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    GOSUB parse_string CALL act_fschdir:OP_STORE:KW_NAME NEXT
+ELEMENT *
+    FORCE CALL act_fschdir:OP_FINISH GOTO eol
 !
 !=============================================================================
 
@@ -177,7 +207,7 @@ ELEMENT *
 
 !=============================================================================
 ! FSDOWNLOAD [ FORMAT:BINARY ] NAME [ = ] "pathname" [ SIZE [ = ] n ]
-!               [ INPUT [ = ] "local-pathname"
+!            [ INPUT [ = ] "local-pathname"
 !
 ELEMENT fsdown
     WORD FORMAT NEXT
@@ -209,6 +239,25 @@ ELEMENT fsdown_input
     FORCE NEXT
 ELEMENT *
     GOSUB parse_string CALL act_fsdown:OP_STORE:KW_INPUT GOTO fsdown_attr
+!
+!=============================================================================
+
+
+!=============================================================================
+! FSENVIRONMENT [ COMPACT [ = ] ON | OFF ] [ ITEMS [ = ] ON | OFF ]
+!               [ LENGTH [ = ] ON | OFF ]
+!
+ELEMENT fsenv
+    WORD COMPACT MIN 3 CALL act_fsenv:OP_CHECK:KW_COMPACT NEXT
+    WORD ITEMS MIN 3 CALL act_fsenv:OP_CHECK:KW_ITEMS NEXT
+    WORD LENGTH MIN 3 CALL act_fsenv:OP_CHECK:KW_LENGTH NEXT
+    FORCE CALL act_fsenv:OP_FINISH GOTO eol
+ELEMENT *
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    WORD OFF CALL act_fsenv:OP_STORE:KW_OFF GOTO fsenv
+    WORD ON CALL act_fsenv:OP_STORE:KW_ON GOTO fsenv
 !
 !=============================================================================
 
@@ -287,30 +336,40 @@ ELEMENT *
 ! HELP [ <command> ]
 !
 ELEMENT help
-    WORD EXIT MIN 3 CALL act_help:1 GOTO eol
-    WORD HELP MIN 3 CALL act_help:2 GOTO eol
-    WORD QUIT MIN 3 CALL act_help:1 GOTO eol
-    FORCE CALL act_help:0 GOTO eol
+    CHAR = GOTO help_value
+    STRING ad CALL act_help:OP_STORE GOTO help
+    FORCE CALL act_help:OP_FINISH GOTO eol
+
+ELEMENT help_value
+    DECIMAL MIN 1 GOTO help
+    GOSUB parse_string GOTO help
+    FORCE GOTO help
 !
 !=============================================================================
 
 
 !=============================================================================
-! INFO [ CONFIG | FILESYS | ID | INFO | MEMORY | PAGECOUNT | STATUS |
-!        USTATUS | VARIABLES ]
+! INFO [ CONFIG | FILESYS | ID | INFO | MEMORY | PAGECOUNT | PRODINFO |
+!        STATUS | USTATUS | VARIABLES ]
 !
 ELEMENT info
-    WORD CONFIG MIN 3 CALL act_info:OP_STORE:KW_CONFIG NEXT
-    WORD FILESYS MIN 3 CALL act_info:OP_STORE:KW_FILESYS NEXT
-    WORD ID MIN 2 CALL act_info:OP_STORE:KW_ID NEXT
-    WORD INFO MIN 3 CALL act_info:OP_STORE:KW_INFO NEXT
-    WORD MEMORY MIN 3 CALL act_info:OP_STORE:KW_MEMORY NEXT
-    WORD PAGECOUNT MIN 3 CALL act_info:OP_STORE:KW_PAGECOUNT NEXT
-    WORD STATUS MIN 3 CALL act_info:OP_STORE:KW_STATUS NEXT
-    WORD USTATUS MIN 3 CALL act_info:OP_STORE:KW_USTATUS NEXT
-    WORD VARIABLES MIN 3 CALL act_info:OP_STORE:KW_VARIABLES NEXT
+    CHAR s GOTO info
+    CHAR e GOTO info_end
+    WORD CONFIG MIN 3 CALL act_info:OP_STORE:KW_CONFIG GOTO info_end
+    WORD FILESYS MIN 3 CALL act_info:OP_STORE:KW_FILESYS GOTO info_end
+    WORD ID MIN 2 CALL act_info:OP_STORE:KW_ID GOTO info_end
+    WORD INFO MIN 3 CALL act_info:OP_STORE:KW_INFO GOTO info_end
+    WORD MEMORY MIN 3 CALL act_info:OP_STORE:KW_MEMORY GOTO info_end
+    WORD PAGECOUNT MIN 3 CALL act_info:OP_STORE:KW_PAGECOUNT GOTO info_end
+    WORD PRODINFO MIN 3 CALL act_info:OP_STORE:KW_PRODINFO GOTO info_end
+    WORD STATUS MIN 3 CALL act_info:OP_STORE:KW_STATUS GOTO info_end
+    WORD USTATUS MIN 3 CALL act_info:OP_STORE:KW_USTATUS GOTO info_end
+    WORD VARIABLES MIN 3 CALL act_info:OP_STORE:KW_VARIABLES GOTO info_end
     FORCE NEXT
 ELEMENT *
+    STRING ad CALL act_ivverb ERROR
+
+ELEMENT info_end
     FORCE CALL act_info:OP_FINISH GOTO eol
 !
 !=============================================================================
@@ -387,6 +446,9 @@ PROMPT "What? "
     WORD NOTIMEOUT MIN 4 CALL act_set:OP_STORE:5 GOTO eol
     WORD DUMP MIN 3 CALL act_set:OP_STORE:6 GOTO eol
     WORD NODUMP MIN 4 CALL act_set:OP_STORE:7 GOTO eol
+    FORCE NEXT
+ELEMENT *
+    STRING ad CALL act_ivverb ERROR
 
 ELEMENT set_timeout
     CHAR = NEXT
@@ -404,6 +466,9 @@ ELEMENT show -
 PROMPT "What? "
     WORD CONNECTION MIN 3 CALL act_show:OP_FETCH:0 GOTO eol
     WORD VERSION MIN 3 CALL act_show:OP_FETCH:1 GOTO eol
+    FORCE NEXT
+ELEMENT *
+    STRING ad CALL act_ivverb ERROR
 !
 !=============================================================================
 
@@ -420,10 +485,21 @@ ELEMENT eol
 !
 ELEMENT parse_string
     CHAR QUOTE NEXT
+    STRING adp SUCCESS
+ELEMENT parse_string0
+    STRING asdp TERM/SKIP QUOTE NEXT
+    CHAR QUOTE NEXT
+    FORCE CALL act_utstr ERROR
 ELEMENT *
-    STRING asdp TERM/KEEP QUOTE NEXT
-ELEMENT *
-    CHAR QUOTE SUCCESS
+    CHAR QUOTE GOTO parse_string0
+    FORCE SUCCESS
+
+!ELEMENT parse_string
+!    STRING asdp LEAD/INCLUDE QUOTE TERM/KEEP QUOTE NEXT
+!    STRING adp SUCCESS
+!    FORCE ERROR
+!ELEMENT *
+!    STRING QUOTE TERM/KEEP QUOTE GOTO parse_string
+!    FORCE SUCCESS
 !
 !=============================================================================
-

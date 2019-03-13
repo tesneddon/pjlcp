@@ -70,7 +70,7 @@ Current connection:\n\
   Flags\n\
     Automatic UEL:       %-3s  Summary:           %-3s\n\
     Packet Dump:         %-3s\n",
-                pcbp->sock != -1 ? pcbp->hostname : "",
+                pcbp->sock != -1 ? pcbp->hostname : "(not connected)",
                 pcbp->sock != -1 ? pcbp->port : 0,
                 pcbp->wcnt,
                 pcbp->rcnt,
@@ -95,4 +95,3 @@ Current connection:\n\
 
     return status;
 } /* act_show */
-

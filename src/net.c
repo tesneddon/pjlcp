@@ -32,7 +32,7 @@
 **--
 */
 #define MODULE PJLCP_NET
-#define IDENT "V1.1"
+#define IDENT "V1.2"
 #ifdef __VMS
 # pragma module MODULE IDENT
 #endif
@@ -44,6 +44,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/select.h>
 #include <sys/socket.h>
 #include "common.h"
 
@@ -53,102 +54,135 @@
 
     int act_connect(void *ctx);
     int act_disconnect(void *ctx);
-    int act_show_connection(void *ctx);
     int send_pjl(void *ctx, char *buf, int len, int expect_response);
 
 int act_connect(void *ctx) {
+    static int name, port;
 
     PCBDEF *pcbp = ctx;
     int status = ACT_SUCCESS;
 
     switch (pcbp->prs.av1) {
     case OP_INIT:       /* Initialize storage */
+        name = port = 0;
         if (pcbp->sock != -1) {
             error(EISCONN, "cannot open connection");
             status = ACT_ERROR;
         } else {
+            /*
+            ** Initialize the connection context.
+            */
             pcbp->rcnt = pcbp->wcnt = 0;
             pcbp->hostname = 0;
             pcbp->port = DEFAULT_PORT;
+            pcbp->pwd = cat(0, DEFAULT_PATH);
+            pcbp->fsmask = -1;
+        }
+        break;
+
+    case OP_CHECK:
+        /*
+        ** Check we haven't doubled up on arguments.
+        */
+        switch (pcbp->prs.av2) {
+        default: break;
+        case KW_NAME: if (name) status = ACT_ERROR; break;
+        case KW_PORT: if (port) status = ACT_ERROR; break;
+        }
+
+        if (status == ACT_ERROR) {
+            error(0, "'%s' argument can only appear once",
+                  keywords[pcbp->prs.av2]);
         }
         break;
 
     case OP_STORE:      /* Store value from command line parse */
         switch (pcbp->prs.av2) {
-        case 0:         /* Store hostname */
-            pcbp->hostname = strndup(pcbp->prs.cur,
-                                     pcbp->prs.end-pcbp->prs.cur);
+        case KW_NAME:         /* Store hostname */
+            name = 1;
+            pcbp->hostname = strip(pcbp->prs.cur,
+                                   pcbp->prs.end - pcbp->prs.cur);
             if (pcbp->hostname == 0) raise(SIGSEGV);
             break;
 
-        case 1:         /* Store numeric port number */
-            pcbp->port = pcbp->prs.num;
-            break;
+        case KW_PORT:         /* Store port number */
+            switch (pcbp->prs.av3) {
+            case 0:           /* Store numeric value */
+                pcbp->port = pcbp->prs.num;
+                break;
 
-        case 2: {       /* Store named port number */\
-            struct servent *entry;
-            char *name;
+            case 1: {         /* Store named port number */
+                struct servent *entry;
+                char *str;
 
-            name = strndup(pcbp->prs.cur, pcbp->prs.end-pcbp->prs.cur);
-            if (name == 0) raise(SIGSEGV);
+                str = strndup(pcbp->prs.cur, pcbp->prs.end - pcbp->prs.cur);
+                if (str == 0) raise(SIGSEGV);
 
-            entry = getservbyname(name, 0);
-            if (entry == 0) {
-                error(0, "unable to translate service name '%s'", name);
-                status = ACT_ERROR;
-            } else {
-                pcbp->port = ntohs(entry->s_port);
+                entry = getservbyname(str, 0);
+                if (entry == 0) {
+                    error(0, "unable to translate service name '%s'", name);
+                    status = ACT_ERROR;
+                } else {
+                    pcbp->port = ntohs(entry->s_port);
+                }
+                free(str);
+                break;
             }
-            free(name);
-            break;
-        }
 
+            }
+            port = 1;
+            break;
         }
         break;
 
     case OP_FINISH: {   /* Make the connection */
         struct hostent *entry;
 
-        entry = gethostbyname(pcbp->hostname);
-        if (entry == 0) {
-            error(h_errno, "cannot resolve hostname '%s'", pcbp->hostname);
+        if (!name) {
+            error(0, "no hostname specified");
             status = ACT_ERROR;
         } else {
-            pcbp->sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-            if (pcbp->sock < 0) {
-                error(errno, "unable to open socket");
+            entry = gethostbyname(pcbp->hostname);
+            if (entry == 0) {
+                error(h_errno, "cannot resolve hostname '%s'",
+                      pcbp->hostname);
                 status = ACT_ERROR;
             } else {
-                int i;
-
-                pcbp->addr.sin_family = AF_INET;
-                pcbp->addr.sin_port = htons(pcbp->port);
-                for (i = 0; entry->h_addr_list[i] != 0; i++) {
-                    pcbp->addr.sin_addr.s_addr =
-                                        *(in_addr_t *) entry->h_addr_list[i];
-                    status = connect(pcbp->sock,
-                                     (struct sockaddr *)&pcbp->addr,
-                                     sizeof(pcbp->addr));
-                    if (status < 0) {
-                        if ((errno != ECONNREFUSED)
-                            && (errno != ENETUNREACH)
-                            && (errno != ETIMEDOUT)) {
-                            /*
-                            ** Don't bother trying any other addresses for
-                            ** any other error.
-                            */
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-
-                if (status < 0) {
-                    error(errno, "unable to connect to printer");
+                pcbp->sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+                if (pcbp->sock < 0) {
+                    error(errno, "unable to open socket");
                     status = ACT_ERROR;
                 } else {
-                    status = ACT_SUCCESS;
+                    int i;
+
+                    pcbp->addr.sin_family = AF_INET;
+                    pcbp->addr.sin_port = htons(pcbp->port);
+                    for (i = 0; entry->h_addr_list[i] != 0; i++) {
+                        pcbp->addr.sin_addr.s_addr =
+                                          *(in_addr_t *) entry->h_addr_list[i];
+                        status = connect(pcbp->sock,
+                                         (struct sockaddr *)&pcbp->addr,
+                                         sizeof(pcbp->addr));
+                        if (status < 0) {
+                            if ((errno != ECONNREFUSED)
+                                && (errno != ENETUNREACH)
+                                && (errno != ETIMEDOUT)) {
+                                /*
+                                ** Don't bother trying any other addresses
+                                ** for any other error.
+                                */
+                                break;
+                            }
+                        } else {
+                            status = ACT_SUCCESS;
+                            break;
+                        }
+                    }
+
+                    if (status < 0) {
+                        error(errno, "unable to connect to printer");
+                        status = ACT_ERROR;
+                    }
                 }
             }
         }
@@ -180,7 +214,7 @@ int act_disconnect(void *ctx) {
 
     if (pcbp->sock == -1) {
         error(ENOTCONN, "unable to disconnect printer");
-        return ACT_ERROR;
+        return ACT_SUCCESS;
     }
 
     close(pcbp->sock);

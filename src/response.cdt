@@ -36,6 +36,7 @@ ELEMENT START
     WORD @PJL NEXT
 ELEMENT *
     WORD FSUPLOAD GOTO fsupload
+! FORCE CALL DUMP SUCCESS
 
 !=============================================================================
 ! FSUPLOAD [ FORMAT:BINARY ] NAME = "pathname" [ OFFSET=n SIZE=n ]
@@ -47,11 +48,19 @@ ELEMENT *
     CHAR : NEXT
 ELEMENT *
     WORD BINARY NEXT
+
 ELEMENT fsupload_attr
+    WORD FILEERROR GOTO fsupload_error
     WORD NAME GOTO fsupload_name
     WORD OFFSET GOTO fsupload_offset
     WORD SIZE GOTO fsupload_size
-    FORCE CALL act_fsupload:OP_FINISH GOTO eol
+    FORCE CALL act_fsupload GOTO eol
+
+ELEMENT fsupload_error
+    CHAR = NEXT
+    FORCE NEXT
+ELEMENT *
+    DECIMAL GOTO eol
 
 ELEMENT fsupload_name
     CHAR = NEXT
@@ -76,6 +85,8 @@ ELEMENT *
 
 !=============================================================================
 ! Eat up all whitespace until the end of the line.
+!
+! Need to have crlf and ff ELEMENTs.
 !
 ELEMENT eol
     STRING s GOTO eol
